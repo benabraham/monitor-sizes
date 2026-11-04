@@ -1,0 +1,127 @@
+/*
+ * Visualization: the always-visible drawing of the compared displays.
+ * Outline colours come from the palette tokens below, which reuse the design
+ * tokens, so light and dark themes follow automatically.
+ */
+
+.visualization {
+  --visualization-baseline: var(--color-baseline);
+  --visualization-palette-0: var(--color-familiar);
+  --visualization-palette-1: var(--color-positive);
+  --visualization-palette-2: var(--color-control);
+  --visualization-palette-3: var(--color-negative);
+
+  display: grid;
+  gap: var(--space-3);
+  min-inline-size: 0;
+}
+
+.visualization__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-3);
+}
+
+.visualization__title {
+  margin: 0;
+  color: var(--color-text);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+}
+
+.visualization__figure {
+  margin: 0;
+  min-inline-size: 0;
+}
+
+.visualization__svg {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface);
+}
+
+.visualization__desk {
+  stroke: var(--color-control);
+  stroke-width: 1;
+}
+
+.visualization__outline {
+  fill-opacity: 0.08;
+}
+
+.visualization__label {
+  fill: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  stroke: var(--color-surface);
+}
+
+.visualization__scale line {
+  stroke: var(--color-text-muted);
+  stroke-width: 1.5;
+}
+
+.visualization__scale text {
+  fill: var(--color-text-muted);
+  font-family: var(--font-numeric);
+  font-size: var(--font-size-xs);
+}
+
+.visualization__caption {
+  margin-block-start: var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-base);
+}
+
+.visualization__empty {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-base);
+}
+
+.visualization__sizes-heading {
+  margin: 0 0 var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.visualization__sizes-list {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.visualization__size {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 var(--space-2);
+  font-size: var(--font-size-sm);
+}
+
+.visualization__size-name {
+  color: var(--color-text);
+  font-weight: var(--font-weight-semibold);
+}
+
+.visualization__size-value {
+  color: var(--color-text-muted);
+  font-variant-numeric: var(--font-numeric);
+}
+
+@media (min-width: 600px) {
+  .visualization__size {
+    font-size: var(--font-size-base);
+  }
+}
