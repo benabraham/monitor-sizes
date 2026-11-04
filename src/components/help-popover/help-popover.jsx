@@ -68,6 +68,8 @@ const placePanel = ({ panel, trigger }) => {
  * - On open the panel is placed beside the trigger; on phones (below 600 px) it is a
  *   bottom sheet.
  * - Where the Popover API is missing, the trigger toggles a `hidden` attribute.
+ * - The title is a paragraph, not a heading: the trigger often sits in a table header
+ *   cell, and a heading there would leak into the table's header structure.
  *
  * `label` is the trigger's accessible name and should say what it explains, for
  * example `"Help: PPI"`. Pass translated strings from the caller.
@@ -163,9 +165,9 @@ export const HelpPopover = ({ id, label, title, children }) => {
         aria-labelledby={titleId}
         hidden={supportsPopover ? undefined : !isOpen}
       >
-        <h3 id={titleId} class="help-popover__title">
-          {title}
-        </h3>
+        <p id={titleId} class="help-popover__title">
+          <strong>{title}</strong>
+        </p>
         <div class="help-popover__body">{children}</div>
       </div>
     </>

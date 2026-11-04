@@ -1,0 +1,90 @@
+/*
+ * App shell: the page frame around the header and the current view. The header is
+ * sticky inside `.app-shell`, so the shell must wrap the whole page.
+ */
+
+.skip-link {
+  position: absolute;
+  inset-block-start: var(--space-2);
+  inset-inline-start: var(--space-2);
+  z-index: var(--z-dialog);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  background-color: var(--color-accent);
+  color: var(--color-accent-contrast);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+  transform: translateY(-200%);
+}
+
+.skip-link:focus-visible {
+  transform: none;
+}
+
+.app-main {
+  min-inline-size: 0;
+  max-inline-size: 80rem;
+  margin-inline: auto;
+  padding-block: var(--space-4) var(--space-10);
+}
+
+/* The container takes focus after a view change, so it needs no ring of its own. */
+.app-main:focus {
+  outline: none;
+}
+
+.app-loading {
+  display: grid;
+  place-items: center;
+  min-block-size: 60dvh;
+  color: var(--color-text-muted);
+}
+
+.app-settings__section {
+  display: grid;
+  gap: var(--space-2);
+  margin-block-start: var(--space-6);
+  padding-block-start: var(--space-4);
+  border-block-start: 1px solid var(--color-border);
+}
+
+.app-settings__heading {
+  font-size: var(--font-size-md);
+}
+
+.app-settings__hint {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.app-settings__list {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.app-settings__item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+}
+
+/*
+ * Visually hidden text keeps its static position, so text inside a scrolling table (the
+ * "Best" label of a scale chip, for example) would sit at the table's far end and widen the
+ * page. Pinning it to the containing block's corner keeps it inside the clip. This belongs in
+ * global.css, next to `.visually-hidden`; it lives here until that file is next changed.
+ */
+.visually-hidden {
+  inset-block-start: 0;
+  inset-inline-start: 0;
+}

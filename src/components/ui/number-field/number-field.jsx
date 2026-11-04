@@ -76,7 +76,8 @@ export const parseLocaleNumber = (text) => {
  * invalid entry is discarded and the last good value is restored. ArrowUp and
  * ArrowDown step the value. An unedited field never calls `onChange`.
  *
- * The unit is linked with `aria-describedby`, so it is announced after the label.
+ * The unit is linked with `aria-describedby`, so it is announced after the label. Ids
+ * passed in `describedBy` (for example an error text) are appended after the unit.
  *
  * @param {object} props
  * @param {import('preact').ComponentChildren} props.label Visible label, also the accessible name.
@@ -89,6 +90,11 @@ export const parseLocaleNumber = (text) => {
  * @param {number} [props.decimals=0] Decimal places kept on commit and shown in the field.
  * @param {'en'|'cs'} [props.locale='en'] Locale for the displayed decimal separator.
  * @param {string} [props.id] Input id. Generated when omitted.
+ * @param {boolean} [props.isInvalid=false] Sets `aria-invalid="true"` on the input.
+ * @param {string} [props.describedBy] Space-separated ids that describe the input, such as
+ *   an error text. Added to the unit's id.
+ * @param {'decimal'|'numeric'|'text'} [props.inputMode='decimal'] Keyboard hint on phones.
+ *   Use `'numeric'` for whole numbers.
  * @returns {import('preact').JSX.Element}
  *
  * @example
@@ -114,10 +120,14 @@ export const NumberField = ({
   decimals = 0,
   locale = 'en',
   id,
+  isInvalid = false,
+  describedBy,
+  inputMode = 'decimal',
 }) => {
   const [generatedId] = useState(() => `number-field-${++fieldSequence}`)
   const inputId = id ?? generatedId
   const unitId = `${inputId}-unit`
+  const describedIds = [unit ? unitId : null, describedBy].filter(Boolean).join(' ')
 
   const formatter = useMemo(
     () =>
@@ -202,11 +212,12 @@ export const NumberField = ({
           id={inputId}
           class="number-field__input"
           type="text"
-          inputmode="decimal"
+          inputmode={inputMode}
           autocomplete="off"
           spellcheck={false}
           value={text}
-          aria-describedby={unit ? unitId : undefined}
+          aria-invalid={isInvalid ? 'true' : undefined}
+          aria-describedby={describedIds || undefined}
           onInput={(event) => setText(event.currentTarget.value)}
           onBlur={commit}
           onKeyDown={handleKeyDown}

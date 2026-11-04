@@ -38,12 +38,6 @@ let formSequence = 0
 /** Order in which invalid fields receive focus after a failed submit. */
 const FIELD_ORDER = ['name', 'diagonal', 'width', 'height', 'distance']
 
-/** Number fields, wrapped and checked from outside (NumberField takes no aria props). */
-const NUMBER_FIELDS = ['diagonal', 'width', 'height', 'distance']
-
-/** Keyboard hint for whole-number fields. NumberField sets `decimal` for every field. */
-const WHOLE_NUMBER_FIELDS = ['width', 'height']
-
 /**
  * Turn the initial value of a field into the draft value. Empty numbers become NaN.
  *
@@ -248,31 +242,19 @@ export const AddDisplayForm = ({
     fieldRefs.current[field]?.querySelector('input')?.focus()
   }
 
-  // NumberField renders its own input, ties it to the unit and always uses the
-  // decimal keypad. Set the error link and the whole-number keypad here, after each
-  // render, so every field is announced and typed in correctly.
-  useEffect(() => {
-    NUMBER_FIELDS.forEach((field) => {
-      const input = fieldRefs.current[field]?.querySelector('input')
-      if (!input) return
-      if (WHOLE_NUMBER_FIELDS.includes(field)) input.setAttribute('inputmode', 'numeric')
-      const message = visibleError(field)
-      const describedBy = (input.getAttribute('aria-describedby') ?? '')
-        .split(' ')
-        .filter((id) => id && id !== errorId(field))
-      if (message) {
-        input.setAttribute('aria-invalid', 'true')
-        describedBy.push(errorId(field))
-      } else {
-        input.removeAttribute('aria-invalid')
-      }
-      if (describedBy.length > 0) {
-        input.setAttribute('aria-describedby', describedBy.join(' '))
-      } else {
-        input.removeAttribute('aria-describedby')
-      }
-    })
-  })
+  /**
+   * Error props for a NumberField: invalid state, and the error text it points to.
+   *
+   * @param {string} field
+   * @returns {{ isInvalid: boolean, describedBy: string|undefined }}
+   */
+  const errorProps = (field) => {
+    const hasError = Boolean(visibleError(field))
+    return {
+      isInvalid: hasError,
+      describedBy: hasError ? errorId(field) : undefined,
+    }
+  }
 
   // Focus the name on mount. Deferred, so a dialog that opens in the same pass is
   // already open when the focus lands.
@@ -391,6 +373,7 @@ export const AddDisplayForm = ({
             unit="″"
             decimals={1}
             locale={lang}
+            {...errorProps('diagonal')}
             onChange={(value) => {
               update({ diagonal: value })
               markTouched('diagonal')
@@ -415,6 +398,8 @@ export const AddDisplayForm = ({
             unit="px"
             decimals={0}
             locale={lang}
+            inputMode="numeric"
+            {...errorProps('width')}
             onChange={(value) => {
               update({ width: value })
               markTouched('width')
@@ -439,6 +424,8 @@ export const AddDisplayForm = ({
             unit="px"
             decimals={0}
             locale={lang}
+            inputMode="numeric"
+            {...errorProps('height')}
             onChange={(value) => {
               update({ height: value })
               markTouched('height')
@@ -568,6 +555,7 @@ export const AddDisplayForm = ({
                   unit={units === 'imperial' ? 'in' : 'cm'}
                   decimals={digits}
                   locale={lang}
+                  {...errorProps('distance')}
                   onChange={(value) => {
                     update({ distance: fromDisplayLength({ value, units }) })
                     markTouched('distance')

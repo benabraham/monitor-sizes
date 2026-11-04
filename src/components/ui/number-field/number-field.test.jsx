@@ -232,4 +232,74 @@ describe('NumberField', () => {
     rerender(<NumberField label="Distance" value={75} onChange={() => {}} />)
     expect(screen.getByRole('textbox', { name: 'Distance' }).value).toBe('75')
   })
+
+  it('marks the input invalid only when isInvalid is set', () => {
+    const { rerender } = render(
+      <NumberField label="Diagonal" value={24} onChange={() => {}} />,
+    )
+    expect(
+      screen.getByRole('textbox', { name: 'Diagonal' }).hasAttribute('aria-invalid'),
+    ).toBe(false)
+    rerender(<NumberField label="Diagonal" value={24} onChange={() => {}} isInvalid />)
+    expect(
+      screen.getByRole('textbox', { name: 'Diagonal' }).getAttribute('aria-invalid'),
+    ).toBe('true')
+  })
+
+  it('describes the input by its unit and by describedBy, in that order', () => {
+    render(
+      <>
+        <p id="diagonal-error">Enter the diagonal.</p>
+        <NumberField
+          label="Diagonal"
+          value={24}
+          unit="″"
+          onChange={() => {}}
+          describedBy="diagonal-error"
+        />
+      </>,
+    )
+    const input = screen.getByRole('textbox', { name: 'Diagonal' })
+    const unitId = screen.getByText('″').id
+    expect(input.getAttribute('aria-describedby')).toBe(`${unitId} diagonal-error`)
+  })
+
+  it('describes the input by describedBy alone when there is no unit', () => {
+    render(
+      <>
+        <p id="width-error">Enter the width.</p>
+        <NumberField
+          label="Width"
+          value={1920}
+          onChange={() => {}}
+          describedBy="width-error"
+        />
+      </>,
+    )
+    expect(
+      screen.getByRole('textbox', { name: 'Width' }).getAttribute('aria-describedby'),
+    ).toBe('width-error')
+  })
+
+  it('has no aria-describedby when there is neither a unit nor describedBy', () => {
+    render(<NumberField label="Width" value={1920} onChange={() => {}} />)
+    expect(
+      screen.getByRole('textbox', { name: 'Width' }).hasAttribute('aria-describedby'),
+    ).toBe(false)
+  })
+
+  it('uses the decimal keyboard by default and the numeric one when asked', () => {
+    const { rerender } = render(
+      <NumberField label="Height" value={1080} onChange={() => {}} />,
+    )
+    expect(
+      screen.getByRole('textbox', { name: 'Height' }).getAttribute('inputmode'),
+    ).toBe('decimal')
+    rerender(
+      <NumberField label="Height" value={1080} onChange={() => {}} inputMode="numeric" />,
+    )
+    expect(
+      screen.getByRole('textbox', { name: 'Height' }).getAttribute('inputmode'),
+    ).toBe('numeric')
+  })
 })
