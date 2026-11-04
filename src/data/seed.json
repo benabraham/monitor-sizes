@@ -1,0 +1,410 @@
+[
+  {
+    "id": "15-6-3840x2160",
+    "name": "4K UHD",
+    "diagonal": 15.6,
+    "width": 3840,
+    "height": 2160,
+    "tag": "laptop"
+  },
+  {
+    "id": "17-3840x2160",
+    "name": "4K UHD",
+    "diagonal": 17,
+    "width": 3840,
+    "height": 2160,
+    "tag": "laptop"
+  },
+  {
+    "id": "16-2-3456x2234",
+    "name": "MacBook Pro 16″",
+    "diagonal": 16.2,
+    "width": 3456,
+    "height": 2234,
+    "tag": "laptop"
+  },
+  {
+    "id": "14-2-3024x1964",
+    "name": "MacBook Pro 14″",
+    "diagonal": 14.2,
+    "width": 3024,
+    "height": 1964,
+    "tag": "laptop"
+  },
+  {
+    "id": "14-2880x1800",
+    "name": "3K",
+    "diagonal": 14,
+    "width": 2880,
+    "height": 1800,
+    "tag": "laptop"
+  },
+  {
+    "id": "13-3-2560x1600",
+    "name": "MacBook Air/Pro 13″ (M1, M2)",
+    "diagonal": 13.3,
+    "width": 2560,
+    "height": 1600,
+    "tag": "laptop"
+  },
+  {
+    "id": "13-6-2560x1664",
+    "name": "MacBook Air 13″",
+    "diagonal": 13.6,
+    "width": 2560,
+    "height": 1664,
+    "tag": "laptop"
+  },
+  {
+    "id": "15-3-2880x1864",
+    "name": "MacBook Air 15″",
+    "diagonal": 15.3,
+    "width": 2880,
+    "height": 1864,
+    "tag": "laptop"
+  },
+  {
+    "id": "31-5-6144x3456",
+    "name": "6K",
+    "diagonal": 31.5,
+    "width": 6144,
+    "height": 3456,
+    "tag": "monitor"
+  },
+  {
+    "id": "27-5120x2880",
+    "name": "5K",
+    "diagonal": 27,
+    "width": 5120,
+    "height": 2880,
+    "tag": "monitor"
+  },
+  {
+    "id": "32-6016x3384",
+    "name": "6K",
+    "diagonal": 32,
+    "width": 6016,
+    "height": 3384,
+    "tag": "monitor"
+  },
+  {
+    "id": "55-5-10080x4320",
+    "name": "10K UW",
+    "diagonal": 55.5,
+    "width": 10080,
+    "height": 4320,
+    "tag": "ultrawide"
+  },
+  {
+    "id": "15-6-2560x1440",
+    "name": "QHD",
+    "diagonal": 15.6,
+    "width": 2560,
+    "height": 1440,
+    "tag": "laptop"
+  },
+  {
+    "id": "16-2560x1440",
+    "name": "QHD",
+    "diagonal": 16,
+    "width": 2560,
+    "height": 1440,
+    "tag": "laptop"
+  },
+  {
+    "id": "49-7680x4320",
+    "name": "8K UHD",
+    "diagonal": 49,
+    "width": 7680,
+    "height": 4320,
+    "tag": "monitor"
+  },
+  {
+    "id": "17-2560x1440",
+    "name": "QHD",
+    "diagonal": 17,
+    "width": 2560,
+    "height": 1440,
+    "tag": "laptop"
+  },
+  {
+    "id": "42-6144x3456",
+    "name": "6K",
+    "diagonal": 42,
+    "width": 6144,
+    "height": 3456,
+    "tag": "monitor"
+  },
+  {
+    "id": "34-5120x2160",
+    "name": "5K2K",
+    "diagonal": 34,
+    "width": 5120,
+    "height": 2160,
+    "tag": "ultrawide"
+  },
+  {
+    "id": "27-3840x2160",
+    "name": "4K UHD",
+    "diagonal": 27,
+    "width": 3840,
+    "height": 2160,
+    "tag": "monitor"
+  },
+  {
+    "id": "28-3840x2160",
+    "name": "4K UHD",
+    "diagonal": 28,
+    "width": 3840,
+    "height": 2160,
+    "tag": "monitor"
+  },
+  {
+    "id": "14-1920x1080",
+    "name": "Full HD",
+    "diagonal": 14,
+    "width": 1920,
+    "height": 1080,
+    "tag": "laptop"
+  },
+  {
+    "id": "55-5-7680x3240",
+    "name": "8K UW",
+    "diagonal": 55.5,
+    "width": 7680,
+    "height": 3240,
+    "tag": "ultrawide"
+  },
+  {
+    "id": "39-5120x2160",
+    "name": "5K2K",
+    "diagonal": 39,
+    "width": 5120,
+    "height": 2160,
+    "tag": "ultrawide"
+  },
+  {
+    "id": "15-6-1920x1080",
+    "name": "Full HD",
+    "diagonal": 15.6,
+    "width": 1920,
+    "height": 1080,
+    "tag": "laptop"
+  },
+  {
+    "id": "57-7680x2160",
+    "name": "DUHD",
+    "diagonal": 57,
+    "width": 7680,
+    "height": 2160,
+    "tag": "ultrawide"
+  },
+  {
+    "id": "31-5-3840x2160",
+    "name": "4K UHD",
+    "diagonal": 31.5,
+    "width": 3840,
+    "height": 2160,
+    "tag": "monitor"
+  },
+  {
+    "id": "40-5120x2160",
+    "name": "5K2K",
+    "diagonal": 40,
+    "width": 5120,
+    "height": 2160,
+    "tag": "ultrawide"
+  },
+  {
+    "id": "32-3840x2160",
+    "name": "4K UHD",
+    "diagonal": 32,
+    "width": 3840,
+    "height": 2160,
+    "tag": "monitor"
+  },
+  {
+    "id": "43-5120x2880",
+    "name": "5K",
+    "diagonal": 43,
+    "width": 5120,
+    "height": 2880,
+    "tag": "monitor"
+  },
+  {
+    "id": "17-1920x1080",
+    "name": "Full HD",
+    "diagonal": 17,
+    "width": 1920,
+    "height": 1080,
+    "tag": "laptop"
+  },
+  {
+    "id": "52-6144x2560",
+    "name": "UW6K",
+    "diagonal": 52,
+    "width": 6144,
+    "height": 2560,
+    "tag": "ultrawide"
+  },
+  {
+    "id": "44-5-5120x2160",
+    "name": "5K2K",
+    "diagonal": 44.5,
+    "width": 5120,
+    "height": 2160,
+    "tag": "ultrawide"
+  },
+  {
+    "id": "23-8-2560x1440",
+    "name": "QHD",
+    "diagonal": 23.8,
+    "width": 2560,
+    "height": 1440,
+    "tag": "monitor"
+  },
+  {
+    "id": "38-3840x2160",
+    "name": "4K UHD",
+    "diagonal": 38,
+    "width": 3840,
+    "height": 2160,
+    "tag": "monitor"
+  },
+  {
+    "id": "37-5-3840x1600",
+    "name": "UW4K",
+    "diagonal": 37.5,
+    "width": 3840,
+    "height": 1600,
+    "tag": "ultrawide"
+  },
+  {
+    "id": "34-3440x1440",
+    "name": "UWQHD",
+    "diagonal": 34,
+    "width": 3440,
+    "height": 1440,
+    "tag": "ultrawide"
+  },
+  {
+    "id": "38-3840x1600",
+    "name": "UW4K",
+    "diagonal": 38,
+    "width": 3840,
+    "height": 1600,
+    "tag": "ultrawide"
+  },
+  {
+    "id": "27-2560x1440",
+    "name": "QHD",
+    "diagonal": 27,
+    "width": 2560,
+    "height": 1440,
+    "tag": "monitor"
+  },
+  {
+    "id": "49-5120x1440",
+    "name": "DQHD",
+    "diagonal": 49,
+    "width": 5120,
+    "height": 1440,
+    "tag": "ultrawide"
+  },
+  {
+    "id": "42-3840x2160",
+    "name": "4K UHD",
+    "diagonal": 42,
+    "width": 3840,
+    "height": 2160,
+    "tag": "monitor"
+  },
+  {
+    "id": "22-1920x1200",
+    "name": "WUXGA",
+    "diagonal": 22,
+    "width": 1920,
+    "height": 1200,
+    "tag": "monitor"
+  },
+  {
+    "id": "43-3840x2160",
+    "name": "4K UHD",
+    "diagonal": 43,
+    "width": 3840,
+    "height": 2160,
+    "tag": "monitor"
+  },
+  {
+    "id": "30-2560x1600",
+    "name": "WQXGA",
+    "diagonal": 30,
+    "width": 2560,
+    "height": 1600,
+    "tag": "monitor"
+  },
+  {
+    "id": "22-1920x1080",
+    "name": "Full HD",
+    "diagonal": 22,
+    "width": 1920,
+    "height": 1080,
+    "tag": "monitor"
+  },
+  {
+    "id": "29-2560x1080",
+    "name": "UW Full HD",
+    "diagonal": 29,
+    "width": 2560,
+    "height": 1080,
+    "tag": "ultrawide"
+  },
+  {
+    "id": "24-1920x1200",
+    "name": "WUXGA",
+    "diagonal": 24,
+    "width": 1920,
+    "height": 1200,
+    "tag": "monitor"
+  },
+  {
+    "id": "40-3440x1440",
+    "name": "UWQHD",
+    "diagonal": 40,
+    "width": 3440,
+    "height": 1440,
+    "tag": "ultrawide"
+  },
+  {
+    "id": "23-8-1920x1080",
+    "name": "Full HD",
+    "diagonal": 23.8,
+    "width": 1920,
+    "height": 1080,
+    "tag": "monitor"
+  },
+  {
+    "id": "48-3840x2160",
+    "name": "4K UHD",
+    "diagonal": 48,
+    "width": 3840,
+    "height": 2160,
+    "tag": "monitor"
+  },
+  {
+    "id": "32-2560x1440",
+    "name": "QHD",
+    "diagonal": 32,
+    "width": 2560,
+    "height": 1440,
+    "tag": "monitor"
+  },
+  {
+    "id": "45-3440x1440",
+    "name": "UWQHD",
+    "diagonal": 45,
+    "width": 3440,
+    "height": 1440,
+    "tag": "ultrawide"
+  }
+]
