@@ -1,4 +1,4 @@
-import { act, render, screen, within } from '@testing-library/preact'
+import { act, render, screen, waitFor, within } from '@testing-library/preact'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { App } from './app.jsx'
@@ -232,10 +232,13 @@ describe('Browse', () => {
     await user.click(within(navigation()).getByRole('button', { name: /^Compare/ }))
 
     const readLine = () => document.querySelector('.equivalence-line')?.textContent ?? ''
+    await waitFor(() => expect(document.querySelector('.compare-data')).not.toBeNull())
+    const [baselineDistance] = await screen.findAllByRole('textbox', {
+      name: 'Exact distance',
+    })
     const before = readLine()
     expect(before).not.toBe('')
 
-    const [baselineDistance] = screen.getAllByRole('textbox', { name: 'Exact distance' })
     await user.clear(baselineDistance)
     await user.type(baselineDistance, '40')
     await user.tab()
@@ -388,7 +391,7 @@ describe('Settings', () => {
     await waitForView('Browse')
 
     await user.click(screen.getByRole('button', { name: 'Settings' }))
-    await user.click(screen.getByRole('radio', { name: 'Čeština' }))
+    await user.click(await screen.findByRole('radio', { name: 'Čeština' }))
 
     expect(document.documentElement.lang).toBe('cs')
     expect(screen.getByRole('button', { name: 'Procházet' })).not.toBeNull()
@@ -401,7 +404,7 @@ describe('Settings', () => {
     await waitForView('Browse')
 
     await user.click(screen.getByRole('button', { name: 'Settings' }))
-    await user.click(screen.getByRole('radio', { name: 'Imperial' }))
+    await user.click(await screen.findByRole('radio', { name: 'Imperial' }))
     await user.click(
       within(screen.getByRole('dialog', { name: 'Settings' })).getByRole('button', {
         name: 'Close',
@@ -410,7 +413,7 @@ describe('Settings', () => {
     await user.click(within(navigation()).getByRole('button', { name: /^Compare/ }))
 
     expect(store.units.value).toBe('imperial')
-    expect(screen.getAllByText('in').length).toBeGreaterThan(0)
+    expect((await screen.findAllByText('in')).length).toBeGreaterThan(0)
     expect(screen.queryAllByText('cm')).toHaveLength(0)
   })
 
@@ -482,7 +485,7 @@ describe('Shell', () => {
     renderApp({ stored: ONBOARDED })
     await waitForView('Browse')
     await user.click(screen.getByRole('button', { name: 'Settings' }))
-    await user.click(screen.getByRole('radio', { name: 'Imperial' }))
+    await user.click(await screen.findByRole('radio', { name: 'Imperial' }))
     await user.click(screen.getByRole('button', { name: 'Close' }))
 
     await user.click(screen.getByRole('button', { name: 'Copy link' }))

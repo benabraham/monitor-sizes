@@ -1,6 +1,6 @@
-import { render, screen, within } from '@testing-library/preact'
+import { fireEvent, render, screen, within } from '@testing-library/preact'
 import userEvent from '@testing-library/user-event'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { locale } from '../../../i18n/index.js'
 import {
   BASELINE_ID,
@@ -285,5 +285,66 @@ describe('DisplayTable', () => {
     const { container } = render(<DisplayTable rows={[]} units="metric" />)
     expect(container.querySelectorAll('tbody tr')).toHaveLength(0)
     expect(headerCell('PPI')).not.toBeNull()
+  })
+})
+
+/** The table row that contains the given display name. */
+const rowFor = (name) => screen.getByRole('button', { name }).closest('tr')
+
+/** A press on an element with a finger, the way a phone reports it. */
+const touchDown = (element) =>
+  fireEvent.pointerDown(element, {
+    pointerType: 'touch',
+    isPrimary: true,
+    button: 0,
+    clientX: 5,
+    clientY: 5,
+  })
+
+describe('DisplayTable long press', () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  it('toggles comparison after a 500 ms press on the row, and says so', () => {
+    const onToggleCompare = vi.fn()
+    render(
+      <DisplayTable
+        rows={threeRows()}
+        units="metric"
+        onToggleCompare={onToggleCompare}
+      />,
+    )
+
+    touchDown(rowFor('UW Full HD'))
+    vi.advanceTimersByTime(500)
+    vi.advanceTimersByTime(100)
+
+    expect(onToggleCompare).toHaveBeenCalledWith(ULTRAWIDE)
+    expect(document.getElementById('browse-announcer').textContent).toBe(
+      'Added UW Full HD to comparison',
+    )
+  })
+
+  it('does nothing on a normal tap of the row', () => {
+    const onToggleCompare = vi.fn()
+    render(
+      <DisplayTable
+        rows={threeRows()}
+        units="metric"
+        onToggleCompare={onToggleCompare}
+      />,
+    )
+    const row = rowFor('UW Full HD')
+
+    touchDown(row)
+    fireEvent.pointerUp(row, { pointerType: 'touch', isPrimary: true, button: 0 })
+    vi.advanceTimersByTime(1000)
+
+    expect(onToggleCompare).not.toHaveBeenCalled()
   })
 })

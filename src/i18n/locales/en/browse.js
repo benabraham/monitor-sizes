@@ -31,6 +31,8 @@ export default {
   compareButton: 'Compare ({count})',
   markFamiliar: 'Mark {name} as familiar',
   compareDisplay: 'Compare {name}',
+  compareAdded: 'Added {name} to comparison',
+  compareRemoved: 'Removed {name} from comparison',
   custom: 'Custom',
   bestScale: 'Best',
   bestScaleHeading: 'Best comfortable scale',

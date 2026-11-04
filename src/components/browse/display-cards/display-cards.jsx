@@ -1,5 +1,6 @@
 import { locale, t } from '../../../i18n/index.js'
 import { formatAspect, formatNumber, formatResolution } from '../../../lib/format.js'
+import { announceCompareChange } from '../compare-feedback.js'
 import { formatDiagonal, formatRatioCell, getBestScaleLabel } from '../browse-format.js'
 import {
   CompareCheckbox,
@@ -7,12 +8,16 @@ import {
   NoComfortableScale,
   ScaleChip,
 } from '../row-parts.jsx'
+import { useLongPress } from '../use-long-press.js'
 import './display-cards.css'
 
 /**
  * One display as a phone card. It shows the name, diagonal, resolution, PPI and
  * the relative pixel size, plus the best comfortable scale as a chip. The star and
  * the compare checkbox are on the card, with 44 px targets on touch screens.
+ *
+ * A long press on the card toggles its comparison too, and says so (see
+ * `use-long-press.js`). The checkbox stays the way to do it without touch.
  *
  * @param {object} props
  * @param {import('../browse-format.js').BrowseRow} props.row
@@ -42,10 +47,18 @@ const DisplayCard = ({
   })
   const isSigned = relativeSize.tone === 'positive' || relativeSize.tone === 'negative'
   const toneClass = isSigned ? `display-cards__value--${relativeSize.tone}` : undefined
+  const longPress = useLongPress({
+    onLongPress: () => {
+      if (!onToggleCompare) return
+      onToggleCompare(id)
+      announceCompareChange({ name, isNowCompared: !isCompared })
+    },
+  })
 
   return (
     <li
       class={`display-cards__card${isBaseline ? ' display-cards__card--baseline' : ''}`}
+      {...longPress}
     >
       <div class="display-cards__head">
         <h3 class="display-cards__title">
@@ -115,6 +128,8 @@ const DisplayCard = ({
  * Phone layout of the Browse list (UX: "On phones it becomes cards"). One card per
  * display, in the order given. Each card holds the best comfortable scale as a
  * chip (for example `125 % → 3070 × 1730`), or a muted "No comfortable scale".
+ * A long press on a card toggles its comparison, with a spoken message and a short
+ * vibration (PRD: "Long-press or a checkbox adds a display to compare").
  *
  * @param {object} props
  * @param {import('../browse-format.js').BrowseRow[]} props.rows Rows, already filtered and sorted.

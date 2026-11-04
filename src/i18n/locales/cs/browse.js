@@ -31,6 +31,8 @@ export default {
   compareButton: 'Porovnat ({count})',
   markFamiliar: 'Označit {name} jako známý',
   compareDisplay: 'Porovnat {name}',
+  compareAdded: 'Přidáno do porovnání: {name}',
+  compareRemoved: 'Odebráno z porovnání: {name}',
   custom: 'Vlastní',
   bestScale: 'Nejlepší',
   bestScaleHeading: 'Nejlepší pohodlné měřítko',

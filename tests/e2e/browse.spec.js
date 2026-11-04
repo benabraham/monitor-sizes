@@ -84,13 +84,11 @@ test.describe('browse', () => {
   test('tapping a familiar chip makes it the baseline', async ({ page }) => {
     const strip = page.getByRole('region', { name: 'Familiar displays' })
     const mbp = strip.getByRole('listitem').filter({ hasText: 'MacBook Pro 14″' })
-    const uhd = strip
-      .getByRole('listitem')
-      .filter({ has: strip.getByRole('button', { name: /^4K UHD 27″/ }) })
+    const uhd = strip.getByRole('listitem').filter({ hasText: /4K UHD/ })
     await expect(mbp).toContainText('Baseline')
     await expect(uhd).not.toContainText('Baseline')
 
-    await uhd.getByRole('button').click()
+    await uhd.getByRole('button', { name: /^4K UHD 27″/ }).click()
 
     await expect(uhd).toContainText('Baseline')
     await expect(mbp).not.toContainText('Baseline')
@@ -119,7 +117,7 @@ test.describe('browse', () => {
     await expect(card.getByRole('checkbox', { name: 'Compare 4K UHD' })).toBeVisible()
   })
 
-  test('Compare is reachable from Browse and keeps the baseline first', async ({ page }) => {
+  test('the Compare button in Browse opens the comparison', async ({ page }) => {
     await goToView(page, 'compare')
     await expect(page.getByRole('navigation', { name: 'Views' }).getByRole('button', { name: 'Compare (2)' })).toBeVisible()
   })

@@ -1,0 +1,123 @@
+import { expect, test } from '@playwright/test'
+import {
+  DISPLAYS,
+  addToCompare,
+  completeOnboarding,
+  goToView,
+} from './helpers.js'
+
+/**
+ * Asserts that a locator's box lies inside the visible viewport.
+ *
+ * @param {import('@playwright/test').Page} page
+ * @param {import('@playwright/test').Locator} locator
+ * @returns {Promise<void>}
+ */
+const expectInViewport = (page, locator) =>
+  expect
+    .poll(async () => {
+      const box = await locator.boundingBox()
+      const viewport = page.viewportSize()
+      if (!box || !viewport) return false
+      return box.y >= 0 && box.y + box.height <= viewport.height
+    })
+    .toBe(true)
+
+/**
+ * The text of the viewing-distance description of a button, read from its
+ * `aria-describedby` target, for example "Sets the viewing distance to 77 cm".
+ *
+ * @param {import('@playwright/test').Locator} button
+ * @returns {Promise<string>}
+ */
+const describedText = (button) =>
+  button.evaluate((element) => {
+    const id = element.getAttribute('aria-describedby') ?? ''
+    return document.getElementById(id)?.textContent ?? ''
+  })
+
+/** The candidate's card in Compare, found by its diagonal and name. */
+const candidate = (page, display) =>
+  page
+    .getByRole('listitem')
+    .filter({ has: page.getByRole('group', { name: new RegExp(`^${display.diagonal} ${display.name}`) }) })
+
+test.describe('compare', () => {
+  test.beforeEach(async ({ page }) => {
+    await completeOnboarding({ page, displays: [DISPLAYS.mbp14, DISPLAYS.uhd27] })
+    await addToCompare(page, DISPLAYS.uhd32)
+    await addToCompare(page, DISPLAYS.uwqhd34)
+    await goToView(page, 'compare')
+  })
+
+  test('the visualization is on screen and stays on screen when scrolled', async ({ page }) => {
+    const visual = page.getByRole('img', { name: /^Physical size of the compared displays/ })
+    await expect(visual).toBeVisible()
+    await expectInViewport(page, visual)
+
+    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight))
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0)
+
+    await expect(visual).toBeVisible()
+    await expectInViewport(page, visual)
+  })
+
+  test('Physical and As seen switch the drawing and its caption', async ({ page }) => {
+    const mode = page.getByRole('group', { name: 'Drawing mode' })
+    await expect(mode.getByRole('radio', { name: 'Physical' })).toBeChecked()
+    await expect(page.getByRole('img', { name: /^Physical size/ })).toBeVisible()
+
+    await mode.getByRole('radio', { name: 'As seen' }).check()
+
+    await expect(page.getByRole('img', { name: /^Apparent size of the compared displays/ })).toBeVisible()
+    await expect(page.getByText(/^As seen: each outline shows its angle/)).toBeVisible()
+
+    await mode.getByRole('radio', { name: 'Physical' }).check()
+    await expect(page.getByRole('img', { name: /^Physical size/ })).toBeVisible()
+  })
+
+  test('changing a candidate distance rewrites the equivalence line', async ({ page }) => {
+    const line = candidate(page, DISPLAYS.uhd32).getByText(/^Looks like your 14\.2″ MacBook Pro 14″/)
+    await expect(line).toBeVisible()
+    const before = await line.textContent()
+
+    const card = candidate(page, DISPLAYS.uhd32)
+    await card.getByRole('textbox', { name: 'Exact distance' }).fill('90')
+
+    await expect(line).not.toHaveText(before)
+    await expect(card.getByRole('slider', { name: 'Distance' })).toHaveValue('90')
+  })
+
+  test('Match size sets the candidate distance to the size-equivalent distance', async ({ page }) => {
+    const card = candidate(page, DISPLAYS.uhd32)
+    const matchSize = card.getByRole('button', { name: 'Match size' })
+    const target = await describedText(matchSize)
+    const distance = target.match(/(\d+)\s*cm/)?.[1]
+    expect(distance, target).toBeTruthy()
+
+    await matchSize.click()
+
+    await expect(card.getByRole('textbox', { name: 'Exact distance' })).toHaveValue(distance)
+  })
+
+  test('the metric grid lists the baseline first', async ({ page }) => {
+    const grid = page.getByRole('table', { name: 'Metrics for each compared display' })
+    const headers = grid.getByRole('columnheader')
+    await expect(headers.nth(0)).toHaveText('Metric')
+    await expect(headers.nth(1)).toContainText('MacBook Pro 14″')
+    await expect(headers.nth(1)).toContainText('Baseline')
+    await expect(headers.nth(2)).toContainText('4K UHD')
+    await expect(headers.nth(3)).toContainText('UWQHD')
+  })
+
+  test('the scaling matrix highlights the comfortable scales of a candidate', async ({ page }) => {
+    const matrix = page.getByRole('table', { name: /^Scaling options for 4K UHD/ }).filter({
+      hasText: '3840 × 2160',
+    })
+    const matrix32 = page.getByRole('table', { name: /Scaling options for .*32″/ })
+    await expect(matrix32).toBeVisible()
+    await expect(matrix32.getByRole('cell', { name: 'Comfortable', exact: true }).first()).toBeVisible()
+    await expect(matrix32.getByRole('cell', { name: 'Outside the comfort window' }).first()).toBeVisible()
+    void matrix
+  })
+})
