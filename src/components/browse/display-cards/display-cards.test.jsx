@@ -1,6 +1,6 @@
-import { render, screen, within } from '@testing-library/preact'
+import { fireEvent, render, screen, within } from '@testing-library/preact'
 import userEvent from '@testing-library/user-event'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { locale } from '../../../i18n/index.js'
 import {
   BASELINE_ID,
@@ -162,5 +162,108 @@ describe('DisplayCards', () => {
   it('renders an empty list for no rows', () => {
     const { container } = render(<DisplayCards rows={[]} units="metric" />)
     expect(container.querySelectorAll('li')).toHaveLength(0)
+  })
+})
+
+/** A press on an element with a finger, the way a phone reports it. */
+const touchDown = (element) =>
+  fireEvent.pointerDown(element, {
+    pointerType: 'touch',
+    isPrimary: true,
+    button: 0,
+    clientX: 5,
+    clientY: 5,
+  })
+
+describe('DisplayCards long press', () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  it('toggles comparison after a 500 ms press on the card, and says so', () => {
+    const onToggleCompare = vi.fn()
+    render(
+      <DisplayCards
+        rows={threeRows()}
+        units="metric"
+        onToggleCompare={onToggleCompare}
+      />,
+    )
+    const card = cardFor('UW Full HD')
+
+    touchDown(card)
+    vi.advanceTimersByTime(500)
+    expect(onToggleCompare).toHaveBeenCalledWith(ULTRAWIDE)
+
+    vi.advanceTimersByTime(100)
+    expect(document.getElementById('browse-announcer').textContent).toBe(
+      'Added UW Full HD to comparison',
+    )
+  })
+
+  it('removes a compared display on a long press, and says it was removed', () => {
+    const onToggleCompare = vi.fn()
+    render(
+      <DisplayCards
+        rows={threeRows()}
+        units="metric"
+        onToggleCompare={onToggleCompare}
+      />,
+    )
+
+    touchDown(cardFor('4K UHD'))
+    vi.advanceTimersByTime(500)
+    vi.advanceTimersByTime(100)
+
+    expect(onToggleCompare).toHaveBeenCalledWith(FOUR_K)
+    expect(document.getElementById('browse-announcer').textContent).toBe(
+      'Removed 4K UHD from comparison',
+    )
+  })
+
+  it('does nothing on a normal tap of the card', () => {
+    const onToggleCompare = vi.fn()
+    render(
+      <DisplayCards
+        rows={threeRows()}
+        units="metric"
+        onToggleCompare={onToggleCompare}
+      />,
+    )
+    const card = cardFor('UW Full HD')
+
+    touchDown(card)
+    fireEvent.pointerUp(card, { pointerType: 'touch', isPrimary: true, button: 0 })
+    vi.advanceTimersByTime(1000)
+
+    expect(onToggleCompare).not.toHaveBeenCalled()
+  })
+
+  it('does not also press the name when a long press ends on it', () => {
+    const onToggleCompare = vi.fn()
+    const onOpenDisplay = vi.fn()
+    render(
+      <DisplayCards
+        rows={threeRows()}
+        units="metric"
+        onToggleCompare={onToggleCompare}
+        onOpenDisplay={onOpenDisplay}
+      />,
+    )
+    const name = within(cardFor('UW Full HD')).getByRole('button', {
+      name: 'UW Full HD',
+    })
+
+    touchDown(name)
+    vi.advanceTimersByTime(500)
+    fireEvent.pointerUp(name, { pointerType: 'touch', isPrimary: true, button: 0 })
+    fireEvent.click(name)
+
+    expect(onToggleCompare).toHaveBeenCalledTimes(1)
+    expect(onOpenDisplay).not.toHaveBeenCalled()
   })
 })

@@ -9,6 +9,7 @@ import {
 import { lengthUnitLabel } from '../../../lib/units.js'
 import { HelpPopover } from '../../help-popover/help-popover.jsx'
 import { Icon } from '../../ui/icon/icon.jsx'
+import { announceCompareChange } from '../compare-feedback.js'
 import {
   formatDiagonal,
   formatLengthDiffCell,
@@ -21,6 +22,7 @@ import {
   NoComfortableScale,
   ScaleChip,
 } from '../row-parts.jsx'
+import { useLongPress } from '../use-long-press.js'
 import './display-table.css'
 
 /**
@@ -93,7 +95,8 @@ const SortableHeader = ({ sortKey, label, help, helpId, sort, onSort }) => {
 
 /**
  * One display as a table row. Cells use the shared formatters. A missing baseline
- * gives the dash in every relative column.
+ * gives the dash in every relative column. A long press on the row toggles its
+ * comparison, as on a card.
  *
  * @param {object} props
  * @param {import('../browse-format.js').BrowseRow} props.row
@@ -153,9 +156,19 @@ const DisplayTableRow = ({
     sameLabel,
   })
   const scales = getComfortableScales({ matrix, bestScale, locale: lang })
+  const longPress = useLongPress({
+    onLongPress: () => {
+      if (!onToggleCompare) return
+      onToggleCompare(id)
+      announceCompareChange({ name, isNowCompared: !isCompared })
+    },
+  })
 
   return (
-    <tr class={`display-table__row${isBaseline ? ' display-table__row--baseline' : ''}`}>
+    <tr
+      class={`display-table__row${isBaseline ? ' display-table__row--baseline' : ''}`}
+      {...longPress}
+    >
       <td class="display-table__control">
         <FamiliarToggle
           name={name}
