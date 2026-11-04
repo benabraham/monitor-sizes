@@ -24,6 +24,32 @@ describe('FamiliarStrip', () => {
     expect(screen.getByText('27″ · 3840 × 2160')).not.toBeNull()
   })
 
+  it('separates the name from the diagonal with a dot that screen readers skip', () => {
+    render(<FamiliarStrip rows={familiarRows()} units="metric" />)
+    const chip = screen.getByText('27″ · 3840 × 2160').closest('.chip')
+    const separator = chip.querySelector('.familiar-strip__sep')
+    expect(separator.textContent.trim()).toBe('·')
+    expect(separator.getAttribute('aria-hidden')).toBe('true')
+    expect(chip.querySelector('.familiar-strip__name').nextElementSibling).toBe(separator)
+  })
+
+  it('reads a chip as name, diagonal and resolution, with spaces between them', () => {
+    render(
+      <FamiliarStrip rows={familiarRows()} units="metric" onSetBaseline={() => {}} />,
+    )
+    const chip = screen.getByRole('button', { name: /4K UHD/ })
+    expect(chip.textContent.replace(/\s+/g, ' ').trim()).toBe(
+      '4K UHD · 27″ · 3840 × 2160',
+    )
+    expect(
+      screen
+        .getByText('Baseline')
+        .closest('.chip')
+        .textContent.replace(/\s+/g, ' ')
+        .trim(),
+    ).toBe('Baseline Full HD · 23.8″ · 1920 × 1080')
+  })
+
   it('marks the baseline with the accent style and the text "Baseline", as a static chip', () => {
     const { container } = render(
       <FamiliarStrip rows={familiarRows()} units="metric" onSetBaseline={() => {}} />,

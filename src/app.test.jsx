@@ -220,7 +220,7 @@ describe('Browse', () => {
       await screen.findByRole('img', { name: /^Physical size of the compared displays/ }),
     ).not.toBeNull()
     expect(
-      screen.getByRole('table', { name: 'Metrics for each compared display' }),
+      await screen.findByRole('table', { name: 'Metrics for each compared display' }),
     ).not.toBeNull()
     expect(document.activeElement).toBe(viewHeading('Compare'))
   })

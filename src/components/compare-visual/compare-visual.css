@@ -18,6 +18,42 @@
   background-color: var(--color-bg);
 }
 
+/*
+ * Phones: the pinned drawing must leave most of the screen to the controls. The drawing scales
+ * down with its viewBox and stays centred, and the text sizes are not pinned (they are outside
+ * this block).
+ */
+@media (max-width: 899px) {
+  .compare-visual__pinned {
+    max-block-size: 38dvh;
+  }
+
+  .compare-visual__pinned .visualization__svg {
+    inline-size: auto;
+    max-inline-size: 100%;
+    max-block-size: 24dvh;
+    margin-inline: auto;
+  }
+}
+
+/*
+ * Desktop: the pinned drawing sticks inside the left column, and never taller than the viewport.
+ * It keeps about a third of the viewport height, so the controls scrolling under it have room.
+ */
+@media (min-width: 900px) {
+  .compare-visual__pinned {
+    max-block-size: calc(100dvh - var(--compare-visual-sticky-top, 0px) - var(--space-4));
+    overflow-y: auto;
+  }
+
+  .compare-visual__pinned .visualization__svg {
+    inline-size: auto;
+    max-inline-size: 100%;
+    max-block-size: 36dvh;
+    margin-inline: auto;
+  }
+}
+
 .compare-visual__controls {
   display: grid;
   gap: var(--space-3);

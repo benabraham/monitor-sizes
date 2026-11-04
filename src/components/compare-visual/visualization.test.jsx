@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { locale } from '../../i18n/index.js'
 import { threeDisplayEntries, workedExampleEntries } from './compare-visual.fixtures.js'
-import { Visualization } from './visualization.jsx'
+import { Visualization, VisualizationSizes } from './visualization.jsx'
 
 /** Replace no-break spaces, so text matches read like ordinary text. */
 const clean = (text) => text.replace(/ /g, ' ')
@@ -71,7 +71,11 @@ describe('Visualization', () => {
 
   it('lists each display size as text for everyone, in physical units', () => {
     render(
-      <Visualization entries={threeDisplayEntries()} mode="physical" units="metric" />,
+      <VisualizationSizes
+        entries={threeDisplayEntries()}
+        mode="physical"
+        units="metric"
+      />,
     )
     const sizes = screen.getByRole('heading', { name: 'Sizes' }).closest('section')
     const list = within(sizes).getByRole('list')
@@ -122,7 +126,12 @@ describe('Visualization', () => {
   })
 
   it('reflects the mode and draws the seen sizes with their distances', () => {
-    render(<Visualization entries={workedExampleEntries()} mode="seen" units="metric" />)
+    render(
+      <>
+        <Visualization entries={workedExampleEntries()} mode="seen" units="metric" />
+        <VisualizationSizes entries={workedExampleEntries()} mode="seen" units="metric" />
+      </>,
+    )
     expect(
       screen.getByRole('img', { name: /Apparent size of the compared displays/ }),
     ).not.toBeNull()
@@ -132,6 +141,18 @@ describe('Visualization', () => {
         .nextElementSibling.textContent,
     )
     expect(baselineText).toMatch(/^\d+\.\d° × \d+\.\d°, from 60 cm$/)
+  })
+
+  it('leaves the size text out of the drawing, so it can scroll apart from it', () => {
+    const { container } = render(
+      <Visualization entries={threeDisplayEntries()} mode="physical" units="metric" />,
+    )
+    expect(container.querySelector('.visualization__sizes')).toBeNull()
+  })
+
+  it('renders no size list when there is nothing to list', () => {
+    const { container } = render(<VisualizationSizes entries={[]} />)
+    expect(container.innerHTML).toBe('')
   })
 
   it('names the size used for same-size distances in the As seen caption', () => {

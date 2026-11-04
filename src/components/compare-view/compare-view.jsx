@@ -1,7 +1,35 @@
-import { CompareData } from '../compare-data/index.js'
+import { useEffect, useState } from 'preact/hooks'
 import { CompareVisual } from '../compare-visual/index.js'
 import { CompareManager } from './compare-manager.jsx'
 import './compare-view.css'
+
+/**
+ * The metric grid and scaling matrix, loaded on first use. Only this view uses them, and
+ * they are about 3 kB gzipped, so they stay out of the first download and the 50 kB budget
+ * (docs/DEPLOYMENT.md). Renders nothing until the chunk arrives, which is immediate once the
+ * app is cached for offline use.
+ *
+ * @param {object} props
+ * @param {object[]} props.entries CompareEntry objects.
+ * @param {'metric'|'imperial'} props.units Unit system.
+ * @returns {import('preact').JSX.Element|null}
+ */
+const LazyCompareData = ({ entries, units }) => {
+  const [Loaded, setLoaded] = useState(null)
+
+  useEffect(() => {
+    let isActive = true
+    import('../compare-data/index.js').then(({ CompareData }) => {
+      // The function form stores the component, not the result of calling it.
+      if (isActive) setLoaded(() => CompareData)
+    })
+    return () => {
+      isActive = false
+    }
+  }, [])
+
+  return Loaded ? <Loaded entries={entries} units={units} /> : null
+}
 
 /**
  * The Compare view (PRD UX "2. Compare"): the visualization with its controls, the
@@ -81,7 +109,7 @@ export const CompareView = ({
         onToggleFamiliarHidden={onToggleFamiliarHidden}
         onGoBrowse={onGoBrowse}
       />
-      {entries.length > 0 && <CompareData entries={entries} units={units} />}
+      {entries.length > 0 && <LazyCompareData entries={entries} units={units} />}
     </div>
   </div>
 )

@@ -1,8 +1,11 @@
 import { effect } from '@preact/signals'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { detectLocale, getMissingKeys, locale, messages, t } from './index.js'
+import { detectLocale, getMissingKeys, loadLocale, locale, messages, t } from './index.js'
 
-const localeFiles = import.meta.glob('./locales/*/*.js', { eager: true })
+// Namespace files only: the per-language barrels (`index.js`) are not namespaces.
+const localeFiles = import.meta.glob(['./locales/*/*.js', '!./locales/*/index.js'], {
+  eager: true,
+})
 const FILE_PATTERN = /^\.\/locales\/([^/]+)\/([^/]+)\.js$/
 
 const languages = [
@@ -113,6 +116,65 @@ describe('t', () => {
     locale.value = 'cs'
     dispose()
     expect(seen).toEqual(['same', 'stejné'])
+  })
+})
+
+describe('loadLocale', () => {
+  // A fresh module instance has no catalogue loaded yet, unlike the shared one. English
+  // loads on import (the module's effect), so wait for it; Czech stays unloaded.
+  const freshModule = async () => {
+    vi.resetModules()
+    const fresh = await import('./index.js')
+    await fresh.loadLocale('en')
+    return fresh
+  }
+
+  it('loads a language on request, and only then', async () => {
+    const fresh = await freshModule()
+    expect(fresh.messages.cs).toBeUndefined()
+    await fresh.loadLocale('cs')
+    expect(fresh.messages.cs['common.same']).toBe('stejné')
+  })
+
+  it('bumps catalogVersion once when a catalogue arrives, and not again when loaded', async () => {
+    const fresh = await freshModule()
+    const before = fresh.catalogVersion.value
+    await fresh.loadLocale('cs')
+    expect(fresh.catalogVersion.value).toBe(before + 1)
+    await fresh.loadLocale('cs')
+    await fresh.loadLocale('en')
+    expect(fresh.catalogVersion.value).toBe(before + 1)
+  })
+
+  it('rejects a language that has no catalogue', async () => {
+    await expect(loadLocale('de')).rejects.toThrow('No catalogue for locale "de"')
+  })
+
+  it('shows English while the Czech catalogue loads, then Czech', async () => {
+    const fresh = await freshModule()
+    fresh.locale.value = 'cs'
+    expect(fresh.t('common.same')).toBe('same')
+    await fresh.loadLocale('cs')
+    expect(fresh.t('common.same')).toBe('stejné')
+  })
+
+  it('re-runs a reactive reader when its catalogue arrives', async () => {
+    const fresh = await freshModule()
+    const seen = []
+    const dispose = effect(() => {
+      seen.push(fresh.t('common.same'))
+    })
+    fresh.locale.value = 'cs'
+    await fresh.loadLocale('cs')
+    dispose()
+    expect(seen).toEqual(['same', 'same', 'stejné'])
+  })
+
+  it('loads the catalogue of the language the locale signal selects', async () => {
+    const fresh = await freshModule()
+    fresh.locale.value = 'cs'
+    await vi.waitFor(() => expect(fresh.messages.cs).toBeDefined())
+    expect(fresh.t('common.same')).toBe('stejné')
   })
 })
 
