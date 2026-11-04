@@ -1,0 +1,56 @@
+/*
+ * Familiar strip: a wrapping row of chips above the table or cards. The baseline
+ * chip keeps the accent outline from the Chip primitive and adds a text marker.
+ */
+
+.familiar-strip {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.familiar-strip__title {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.familiar-strip__list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.familiar-strip__chip {
+  max-inline-size: 100%;
+  min-block-size: 32px;
+}
+
+@media (pointer: coarse) {
+  .familiar-strip__chip {
+    min-block-size: 44px;
+  }
+}
+
+.familiar-strip__marker {
+  padding-inline-end: var(--space-1);
+  border-inline-end: 1px solid currentColor;
+  font-weight: var(--font-weight-semibold);
+}
+
+.familiar-strip__name {
+  font-weight: var(--font-weight-semibold);
+}
+
+.familiar-strip__detail {
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-regular);
+}
+
+.familiar-strip__empty {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}

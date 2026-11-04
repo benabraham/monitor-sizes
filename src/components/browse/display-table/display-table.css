@@ -1,0 +1,121 @@
+/*
+ * Browse table: dense, tabular numerals, sticky-free. Scrolls sideways inside
+ * `.table-wrap` on narrow screens. Baseline: accent left border (plus the sr-only
+ * text in the row). Signed values: colour and sign together.
+ */
+
+.display-table {
+  font-size: var(--font-size-sm);
+  line-height: 1.3;
+}
+
+.display-table caption {
+  caption-side: top;
+}
+
+.display-table th,
+.display-table td {
+  padding-block: var(--space-1);
+  padding-inline: var(--space-2);
+  vertical-align: middle;
+}
+
+.display-table__head-cell {
+  padding-block: var(--space-2);
+}
+
+.display-table__head {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.display-table__sort {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-block-size: 28px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+}
+
+.display-table__head-cell[aria-sort='ascending'] .display-table__sort,
+.display-table__head-cell[aria-sort='descending'] .display-table__sort {
+  color: var(--color-text);
+}
+
+.display-table__control {
+  padding-inline: var(--space-1);
+  text-align: center;
+}
+
+.display-table__name {
+  min-inline-size: 10rem;
+  text-align: start;
+}
+
+.display-table__name-button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  font-weight: var(--font-weight-semibold);
+  text-align: start;
+  cursor: pointer;
+}
+
+.display-table__badge {
+  display: inline-block;
+  margin-inline-start: var(--space-1);
+  padding-inline: var(--space-1);
+  border: 1px solid var(--color-control);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  vertical-align: middle;
+}
+
+.display-table__row--baseline > td:first-child {
+  box-shadow: inset 3px 0 0 var(--color-baseline);
+}
+
+.display-table__row--baseline {
+  background-color: var(--color-accent-subtle);
+}
+
+.display-table__row--baseline:hover {
+  background-color: var(--color-accent-subtle);
+}
+
+.display-table__value--positive {
+  color: var(--color-positive);
+}
+
+.display-table__value--negative {
+  color: var(--color-negative);
+}
+
+.display-table__value--strong {
+  font-weight: var(--font-weight-semibold);
+}
+
+.display-table__scales {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  min-inline-size: 14rem;
+}
+
+@media (pointer: coarse) {
+  .display-table__sort,
+  .display-table__name-button {
+    min-block-size: 44px;
+  }
+}
