@@ -63,28 +63,28 @@ Everything ships together in v1, all at once. **P0** = release blocker, **P1** =
 | ID | Requirement | Priority |
 | --- | --- | --- |
 | F1 | A display record stores only inputs: name, diagonal (inch), width px, height px, plus an optional tag (laptop / monitor / ultrawide). All metrics are derived. | P0 |
-| F2 | **Familiar displays**: the user marks one or more displays as familiar, each with their usual viewing distance (default 60 cm for monitors, 45 cm for laptops) and the OS scale they use on it. If their display isn't in the list, they add it right there (F17). The set persists locally and is chosen during onboarding. | P0 |
-| F3 | **Active baseline**: exactly one familiar display drives the relative columns (% and diff) at a time. Switching is one tap. The other familiar displays stay visible as secondary references. | P0 |
+| F2 | **Familiar displays**: the user marks one or more displays as familiar, each with their usual viewing distance (default 60 cm for monitors, 45 cm for laptops) and the OS scale they use on it. If their display isn't in the list, they add it right there (F17). The set persists locally and is chosen during onboarding. There is no built-in default: the app asks which displays the user is familiar with, and at least one must be chosen before continuing. | P0 |
+| F3 | **Active baseline**: exactly one familiar display drives the relative columns (% and diff) at a time. Switching is one tap. The other familiar displays stay visible as secondary references. The first familiar display picked during onboarding becomes the baseline. | P0 |
 | F4 | List view shows per display: diagonal, PPI, relative pixel size, aspect label, resolution, physical width × height, size diff vs baseline, area and ratio, raw megapixels and ratio (native, unscaled). | P0 |
 | F5 | Sort by any metric. Default sort is PPI descending, matching the sheet. | P0 |
-| F6 | Scaling matrix per display for every scale in the active preset (F21): logical resolution, effective PPI, effective workspace. Only scales inside the comfort window are shown. | P0 |
-| F7 | Editable comfort window: min and max effective PPI (default 90–105) and min logical width (default 1024 px). | P0 |
+| F6 | Scaling matrix per display for every scale in the active preset (F21): logical resolution, effective PPI, effective workspace. Browse shows only scales inside the comfort window; Compare shows every scale in the preset with the comfortable ones highlighted (not by colour alone). | P0 |
+| F7 | Editable comfort window: min and max effective PPI (default 90–105) and min logical width (default 1024 px). A toggle switches the rule between PPI (default) and logical PPD (F23); exactly one rule is active at a time and it drives the filter (F8), the best-scale chip and the matrix highlighting. | P0 |
 | F8 | Filter toggle: "only displays with at least one comfortable scale". | P0 |
 | F9 | Text search by name and filter by tag, aspect and diagonal range. | P1 |
 | F10 | **Compare**: any number of displays (practical limit about 8). All familiar displays are included automatically and can be hidden individually. | P0 |
 | F11 | **Visualization is always shown** in Compare: every compared display drawn together, on desktop beside the metrics and on phones pinned above them. It cannot be collapsed away. | P0 |
 | F12 | Visualization has two modes: **Physical** (true relative size, one length scale) and **As seen** (relative angular size at each display's viewing distance). | P0 |
-| F13 | **Viewing distance** per compared display, editable. A candidate defaults to the active baseline's distance. | P0 |
+| F13 | **Viewing distance** per compared display, editable. A candidate defaults to the active baseline's distance. Each compared display also has an editable **scale**: familiar displays use their saved scale; a candidate starts at its best comfortable scale (closest to the middle of the comfort window), falling back to the scale nearest the window if none fits. | P0 |
 | F14 | **Angular metrics** per display: horizontal and vertical field of view (°), pixels per degree (PPD), and logical pixels per degree at the chosen scale. | P0 |
 | F15 | **Equivalent distance** vs the baseline, three variants: same apparent size, same sharpness (PPD), same text/UI size at the chosen scales. One tap applies a variant to the candidate's distance. | P0 |
 | F16 | **Units and language**: metric (default) or imperial, and a Czech or English UI (default from the browser language) with locale number formatting, such as decimal commas in Czech. Both are remembered locally and stored in the URL. | P0 |
 | F17 | Add your own display from onboarding, the familiar picker, Browse and Compare, and mark it familiar in the same step. Edit and delete custom displays, stored locally. Built-in displays can be hidden but not edited. | P0 |
 | F18 | Import and export custom displays and the familiar set as JSON. | P1 |
-| F19 | URL holds the full view state: familiar set, baseline, compared set, distances, scales, units, comfort window, filters, sort. Opening the link restores it. | P0 |
+| F19 | URL holds the full view state: familiar set, baseline, compared set, distances, scales, units, comfort window, filters, sort. Opening the link restores it. Custom displays referenced by the state travel inside the link as their inputs (name, diagonal, width, height), so the recipient sees the same comparison and can save them as their own with one tap. | P0 |
 | F20 | Inline help per metric, replacing the "halp" sheet. | P1 |
-| F21 | Scale presets: a radio group switches between Windows (100–200 % in 25 % steps), macOS (2× rendering with common "looks like" scales) and Linux/Wayland (100, 110, 125, 150, 175, 200 %). It defaults to the detected OS, and users can add and remove custom scales such as 133 % or 300 %. | P0 |
+| F21 | Scale presets: a radio group switches between Windows (100–200 % in 25 % steps), macOS ("looks like" widths 1280, 1440, 1512, 1680, 1728, 1920, 2048, 2304, 2560, 3008 and 3200 px; per display s = native width ÷ looks-like width, shown only for 1 ≤ s ≤ 2) and Linux/Wayland (100, 110, 125, 150, 175, 200 %). It defaults to the detected OS, and users can add and remove custom scales such as 133 % or 300 %. | P0 |
 | F22 | "Like my screen" helper that pre-fills logical resolution and scale from the browser and asks only for the diagonal. | P1 |
-| F23 | Comfort window expressed in logical pixels per degree, so it accounts for viewing distance. | P1 |
+| F23 | Comfort window expressed in logical pixels per degree, so it accounts for viewing distance. Selected via the F7 toggle; in Browse it uses the active baseline's distance. | P1 |
 
 ## Calculation spec
 
@@ -93,8 +93,8 @@ All metrics derive from w, h (px), d (inch diagonal), the active baseline (subsc
 | Metric | Definition | Display |
 | --- | --- | --- |
 | PPI | √(w² + h²) / d | integer |
-| Relative pixel size | PPI\_ref / PPI − 1 | signed %, "same" at 0 |
-| Aspect label | w:h reduced by GCD, mapped to a marketing name (16:9, 16:10, “21:9” for 64:27 and 43:18, 32:9, 24:10) | label, or "1.55:1" if unmapped |
+| Relative pixel size | PPI\_ref / PPI − 1 | signed %, "same" when it rounds to 0 |
+| Aspect label | w:h reduced by GCD, mapped to a marketing name: 16:9, 8:5 → 16:10, 7:3 → 21:9 (exact), 64:27 and 43:18 → “21:9” (quoted = approximate), 32:9, 12:5 → 24:10, 21:10, 16:5 → 32:10 | label, or "1.55:1" if unmapped |
 | Width, height (cm) | px / PPI × 2.54 | integer |
 | Width, height diff (cm) | cm − cm\_ref | signed integer, bold if positive |
 | Area (dm²) | width cm × height cm / 100 | integer |
@@ -105,6 +105,10 @@ All metrics derive from w, h (px), d (inch diagonal), the active baseline (subsc
 | Effective PPI at s | PPI / s | integer |
 | Comfortable at s | effective PPI within \[min, max\] and w / s ≥ min width | boolean |
 | Workspace at s (scaled pixels) | (w / s) × (h / s) / 10⁶ | 1 decimal |
+
+With the macOS preset, s is derived per display as w / looks-like width, so the matrix rows are looks-like resolutions rather than a shared percentage grid.
+
+**Signed values.** Any signed value that displays as 0 at its precision reads "same", never "+0 %" or "− 0". (The sheet shows "same" only for an exact 0; no current row is affected, so the tests still match.)
 
 **Angular metrics.** v is the viewing distance in the same length unit as W and H. Equal angle means equal L / v, so the size match is exact. The sharpness and text matches use the small-angle approximation, which is off by under 0.1 % at desk distances.
 
@@ -132,14 +136,14 @@ Worked example, used as a test fixture. Baseline is a 24″ FHD (92 PPI) at 60 c
 - **Workspace megapixels are overstated.** The sheet divides Mpix by s, but logical pixels scale with s². Example: 42″ 4K at 110 % shows 7.5 Mpix, while 3490 × 1960 is about 6.8. Decided: keep two separate comparisons. Raw megapixels compare native panels with no scaling. Workspace uses the s² formula, per scale. The 5 Mpix cut-off is dropped, because the comfort window and min logical width already hide unusable scales, such as a 6K panel scaled down to 720p-like sizes.
 - **Aspect labels**: float equality plus a 1.5–1.6 catch-all labels MacBook panels (≈1.55:1) as "16:9". Use GCD reduction instead.
 - **Single reference**: the familiar set replaces the checkbox, and exactly one active baseline is enforced in the UI.
-- **Naming**: 3440 × 1440 is "2K UW" at 34″ but "4K UW" at 40″. Normalise names in the seed data.
+- **Naming**: 3440 × 1440 is "2K UW" at 34″ but "4K UW" at 40″. Normalise names in the seed data, including `ENDGAME 8K+`, `ENDGAME 8K`, `6K-`, `4K-`, `FullHD+W`, `QHD` for 5120 × 1440, the long MacBook names and `2K+ (MB Air M1; …)`.
 - **Redundant ABS()** in the area and megapixel ratios. Drop it; the results don't change.
 
-Acceptance: a unit test suite seeded from the current sheet values, asserting every row and metric within rounding tolerance.
+Acceptance: a unit test suite seeded from the current sheet values (frozen in `data/sheet-snapshot/`, reference row 42″ 4K), asserting every row and metric within rounding tolerance. The 42″ 4K reference is a test fixture only; the app has no default baseline.
 
 ## UX
 
-The app has three views. On first launch, onboarding asks the user to pick one or more familiar displays from the list, or add their own if it's missing, then set the distance and scale for each. Defaults are prefilled, and the unit system is chosen here too.
+The app has three views. On first launch, onboarding asks which displays the user is familiar with: they pick one or more from the list, or add their own if it's missing, then set the distance and scale for each. At least one is required and onboarding can't be skipped; nothing is preselected. Distance and scale are prefilled per display, and the unit system is chosen here too.
 
 1. **Browse.** A dense, sortable table on desktop. On phones it becomes cards: name, diagonal, resolution, PPI and the best comfortable scale as a chip, for example "125 % → 3070 × 1730". Familiar displays sit in a pinned strip at the top; the active baseline is in the accent colour. A sticky toolbar holds search, filters, the comfort window, and the units, language and scale-preset switches.
 2. **Compare.** Any number of displays, with the familiar ones included by default:
@@ -213,3 +217,10 @@ Everything is built and released at once in v1, with no phases and nothing defer
 | UI language | Czech and English in v1. |
 | Release scope | All features ship together in v1. |
 | Hosting and licence | GitHub Pages, MIT-licensed open source. |
+| Default baseline | None. Onboarding requires at least one familiar display; the first one picked becomes the baseline. |
+| Custom displays in shared links | Embedded in the URL as inputs; the recipient can save them with one tap. |
+| macOS preset | "Looks like" widths; s = native width ÷ looks-like width, per display, 1× to 2×. |
+| Comfort rule | Toggle between PPI (default) and logical PPD; one rule active at a time. |
+| Matrix outside the comfort window | Hidden in Browse, shown and highlighted in Compare. |
+| Candidate scale in Compare | Best comfortable scale, editable; familiar displays use their saved scale. |
+| "same" label | Whenever the value rounds to 0. |
