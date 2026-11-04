@@ -1,0 +1,87 @@
+/* Metric grid: one column per compared display, one row per metric. */
+.metric-grid {
+  min-inline-size: 100%;
+  background-color: var(--color-surface);
+  font-size: var(--font-size-sm);
+}
+
+.metric-grid th,
+.metric-grid td {
+  padding-block: var(--space-2);
+  padding-inline: var(--space-2);
+}
+
+.metric-grid__corner,
+.metric-grid__head {
+  vertical-align: bottom;
+  min-inline-size: 8.5rem;
+  color: var(--color-text);
+}
+
+/* Role rules: a dashed top edge for familiar displays, a solid one for candidates.
+   The badge text says the same thing, so the rule is never the only signal. */
+.metric-grid__head {
+  border-block-start: 2px solid var(--color-control);
+  padding-block-start: var(--space-3);
+}
+
+.metric-grid__head--baseline {
+  border-block-start-color: var(--color-baseline);
+}
+
+.metric-grid__head--familiar {
+  border-block-start-style: dashed;
+  border-block-start-color: var(--color-familiar);
+}
+
+.metric-grid__name {
+  display: block;
+  font-weight: var(--font-weight-semibold);
+  overflow-wrap: anywhere;
+}
+
+.metric-grid__diagonal {
+  display: block;
+  color: var(--color-text-muted);
+  font-variant-numeric: var(--font-numeric);
+  margin-block: var(--space-1);
+}
+
+.metric-grid__corner {
+  position: sticky;
+  inset-inline-start: 0;
+  z-index: 2;
+  background-color: var(--color-surface);
+}
+
+.metric-grid__row-head {
+  position: sticky;
+  inset-inline-start: 0;
+  z-index: 1;
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  font-weight: var(--font-weight-medium);
+  white-space: normal;
+  min-inline-size: 7.5rem;
+  max-inline-size: 11rem;
+}
+
+.metric-grid__row-label {
+  margin-inline-end: var(--space-1);
+}
+
+.metric-grid__row--group-start > th,
+.metric-grid__row--group-start > td {
+  border-block-start: 1px solid var(--color-control);
+}
+
+.metric-grid td {
+  font-variant-numeric: var(--font-numeric);
+}
+
+@media (min-width: 600px) {
+  .metric-grid__row-head {
+    min-inline-size: 11rem;
+    max-inline-size: none;
+  }
+}

@@ -1,0 +1,107 @@
+/* Scaling matrix: one table per compared display. Side by side on wide containers,
+   stacked on phones. */
+.scaling-matrix {
+  container: scaling-matrix / inline-size;
+}
+
+.scaling-matrix__grid {
+  display: grid;
+  gap: var(--space-6);
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@container scaling-matrix (min-width: 48rem) {
+  .scaling-matrix__grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr));
+  }
+}
+
+.scaling-matrix__entry {
+  min-inline-size: 0;
+}
+
+.scaling-matrix__title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin-block: 0 var(--space-2);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+}
+
+.scaling-matrix__table {
+  font-size: var(--font-size-sm);
+  background-color: var(--color-surface);
+}
+
+.scaling-matrix__table th,
+.scaling-matrix__table td {
+  padding-block: var(--space-2);
+  padding-inline: var(--space-2);
+}
+
+.scaling-matrix__table thead th {
+  color: var(--color-text);
+  vertical-align: bottom;
+}
+
+.scaling-matrix__scale {
+  color: inherit;
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+}
+
+.scaling-matrix__looks-like {
+  display: block;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-muted);
+}
+
+.scaling-matrix__table tbody tr.scaling-matrix__row--comfortable {
+  background-color: var(--color-comfortable-bg);
+  color: var(--color-comfortable-text);
+}
+
+.scaling-matrix__table tbody tr.scaling-matrix__row--comfortable th {
+  color: inherit;
+}
+
+.scaling-matrix__flags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.scaling-matrix__flag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding-inline: var(--space-2);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  white-space: nowrap;
+}
+
+.scaling-matrix__flag--comfortable {
+  border: 1px solid currentColor;
+  color: var(--color-comfortable-text);
+}
+
+.scaling-matrix__flag--in-use {
+  background-color: var(--color-accent-subtle);
+  color: var(--color-accent-subtle-text);
+}
+
+.scaling-matrix__flag--recommended {
+  background-color: var(--color-baseline);
+  color: var(--color-accent-contrast);
+}
+
+.scaling-matrix__empty {
+  margin: 0;
+  color: var(--color-text-muted);
+}
