@@ -47,6 +47,7 @@ src/
     locales/{en,cs}/<namespace>.js   one file per namespace per language
   state/
     store.js                signals, computed values, actions (wave 2)
+    selectors.js            pure filtering, sorting, entry building, reconciliation
   components/<kebab-name>/<kebab-name>.jsx (+ .css, .test.jsx)
   styles/
     tokens.css              design tokens (light + dark)
@@ -348,36 +349,188 @@ test asserts that `en` and `cs` have identical key sets.
 
 ## `state/store.js` (wave 2)
 
-Single module of signals + pure actions. Components import what they need.
+Application state: signals, computed values, actions, hydration, persistence and URL sync.
+Components import what they need. The module is a factory, `createStore(options)`, so tests
+build fresh stores with fake storage, location and history. The app's store is the singleton
+`store`. It is the default export, and each of its members is also a named export, so a
+component can write `import { browseRows, toggleFamiliar } from '../state/store.js'`.
+
+The pure logic lives in `state/selectors.js`: filtering, sorting, row and entry building,
+input parsing, cross-reference reconciliation and the import and export payloads. The store
+only wires these helpers to signals. Behaviour is specified in PRD F2–F5, F7–F10, F13, F15–F19,
+F21 and F23, and the link format is in [`STATE.md`](./STATE.md).
+
+### Options
 
 ```js
-// signals
-builtInDisplays, customDisplays, hiddenBuiltInIds
-familiar, baselineId, compareIds, compareSettings, hiddenFamiliarIds
-units, presetId, customScales, comfort, filters, sort, vizMode, sizeMatchBy, view
-isOnboarded, isHydrated
-// computed
-allDisplays          visible displays (built-in minus hidden, plus custom)
-displaysById         Map id → Display (includes hidden, for familiar lookups)
-metricsById          Map id → DisplayMetrics
-baseline             { display, metrics, distance, scale } | null
-browseRows           filtered + sorted rows: { display, metrics, relative, matrix, bestScale }
-compareEntries       familiar (not hidden) + compareIds: { display, metrics, relative,
-                     distance, scale, angular, equivalent, matrix, isFamiliar, isBaseline }
-// actions (each persists + updates URL)
-addCustomDisplay({ name, diagonal, width, height, tag, isFamiliar, distance, scale }) → id
-updateCustomDisplay({ id, ...inputs }), deleteCustomDisplay(id)
-hideBuiltIn(id), unhideBuiltIn(id)
-toggleFamiliar(id), setFamiliarSettings({ id, distance, scale }), setBaseline(id)
-toggleCompare(id), setCompareSettings({ id, distance, scale }), applyEquivalent({ id, kind })
-toggleFamiliarHidden(id)
-setUnits, setLocale, setPresetId, addCustomScale, removeCustomScale
-setComfort(partial), setFilters(partial), setSort({ key, direction }), setVizMode,
-setSizeMatchBy, setView
-completeOnboarding()
-exportJson() → string, importJson(text) → { isOk, error? }      F18
-hydrate()   load storage, then apply URL state on top; sets isHydrated
+createStore({
+  seed = seedJson,                                 // built-in displays (src/data/seed.json)
+  storage = { loadPersisted, savePersisted },      // lib/storage.js
+  location = globalThis.location,                  // only location.hash is read
+  history = globalThis.history,                    // replaceState(null, '', '#s=…')
+  detectPreset = detectPresetId,                   // used when no preset is saved
+  detectLang = detectLocale,                       // used when the link and storage have no language
+}) → Store
 ```
+
+### Signals
+
+| Signal                                                                   | Type                                | Notes                                                              |
+| ------------------------------------------------------------------------ | ----------------------------------- | ------------------------------------------------------------------ |
+| `builtInDisplays`                                                        | `Display[]`                         | the seed, inputs only                                              |
+| `customDisplays`                                                         | `Display[]`                         | `isCustom: true`                                                   |
+| `hiddenBuiltInIds`, `hiddenFamiliarIds`                                  | `string[]`                          | built-ins hidden everywhere; familiar displays hidden in Compare   |
+| `familiar`                                                               | `FamiliarEntry[]`                   | `{ id, distance (in), scale }`, F2                                 |
+| `baselineId`                                                             | `string \| null`                    | one familiar id whenever `familiar` is not empty, else `null` (F3) |
+| `compareIds`                                                             | `string[]`                          | candidates; may repeat a familiar id, Compare de-duplicates it     |
+| `compareSettings`                                                        | `Record<id, { distance?, scale? }>` | candidates only; a familiar display's values live on its entry     |
+| `units`, `presetId`, `customScales`, `comfort`, `vizMode`, `sizeMatchBy` | see `ViewState`                     | preferences, persisted and in the link                             |
+| `filters`, `sort`, `view`                                                | see `ViewState`                     | link only, not persisted                                           |
+| `locale`                                                                 | `'en' \| 'cs'`                      | **the shared `locale` signal of `i18n`**, not a copy               |
+| `isOnboarded`, `isHydrated`, `isSharedView`                              | `boolean`                           | see "Shared links and persistence"                                 |
+
+### Computed values
+
+| Computed         | Value                                                                                                                                                                   |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `allDisplays`    | built-ins minus hidden, then custom displays                                                                                                                            |
+| `displaysById`   | `Map` of every display, hidden ones included, so familiar lookups always work                                                                                           |
+| `metricsById`    | `Map` id → `DisplayMetrics`                                                                                                                                             |
+| `baseline`       | `{ display, metrics, distance, scale }` or `null`                                                                                                                       |
+| `browseRows`     | `BrowseRow[]`: every visible display, filtered (F8, F9), sorted (F5). Familiar displays are included and filtered like the rest; `familiarRows` is the unfiltered strip |
+| `familiarRows`   | `BrowseRow[]` for the familiar set, in familiar order, unfiltered, including hidden built-ins                                                                           |
+| `compareEntries` | `CompareEntry[]`: the baseline first, then the other familiar displays not hidden in Compare, in familiar order, then the candidates                                    |
+
+The rows are built in two steps. `visibleRows` depends on the baseline and the scale settings
+(comfort, preset, custom scales). The filter and sort step depends on the filters, the sort and
+the locale. A filter change therefore does not rebuild the metrics.
+
+```js
+/** @typedef {object} BrowseRow
+ *  @property {Display} display
+ *  @property {DisplayMetrics} metrics
+ *  @property {RelativeMetrics|null} relative     vs the baseline, null without one
+ *  @property {MatrixRow[]} matrix                every scale option; `isComfortable` flags the rows
+ *  @property {MatrixRow|null} bestScale          recommended scale; `logicalWidth` sorts by it
+ *  @property {boolean} isFamiliar
+ *  @property {boolean} isBaseline
+ *  @property {boolean} isCompared                shown in Compare
+ */
+/** @typedef {object} CompareEntry
+ *  @property {Display} display
+ *  @property {DisplayMetrics} metrics
+ *  @property {RelativeMetrics|null} relative
+ *  @property {number} distance                   inches
+ *  @property {number} scale
+ *  @property {AngularMetrics} angular            FOV, PPD, logical PPD at this distance and scale
+ *  @property {EquivalentDistances|null} equivalent   null for the baseline or without one
+ *  @property {MatrixRow[]} matrix                every scale option at this distance
+ *  @property {MatrixRow|null} bestScale
+ *  @property {boolean} isFamiliar
+ *  @property {boolean} isBaseline
+ */
+```
+
+The distance of a compared display is resolved in this order: familiar entry, candidate
+setting, the baseline's distance, then `defaultDistanceFor(display)`. Its scale is resolved as:
+familiar entry, candidate setting, `bestScale.scale`, then `1`.
+
+### Actions
+
+Every action updates signals synchronously. Persistence and the URL are effects. A
+validating action returns `false` and changes nothing when its input is refused.
+
+| Action                                                                                      | Returns            | Behaviour                                                                                                                                                                                                                                                            |
+| ------------------------------------------------------------------------------------------- | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `toggleFamiliar(id)`                                                                        | `boolean`          | adds with `defaultDistanceFor` and the best scale (F2); removing the baseline moves it to the first remaining display (F3)                                                                                                                                           |
+| `setFamiliarSettings({ id, distance?, scale? })`                                            | `boolean`          | partial; `false` for a display that is not familiar                                                                                                                                                                                                                  |
+| `setBaseline(id)`                                                                           | `boolean`          | familiar displays only                                                                                                                                                                                                                                               |
+| `toggleCompare(id)`                                                                         | `boolean`          | candidates only. Removing forgets its settings. Familiar displays are refused: hide them with `toggleFamiliarHidden`                                                                                                                                                 |
+| `setCompareSettings({ id, distance?, scale? })`                                             | `boolean`          | a familiar id routes to `setFamiliarSettings`. A candidate must be in Compare                                                                                                                                                                                        |
+| `applyEquivalent({ id, kind })`                                                             | `boolean`          | `kind` is `sameSize`, `sameSharpness` or `sameTextSize` (F15). Refused for the baseline, or without a baseline                                                                                                                                                       |
+| `toggleFamiliarHidden(id)`                                                                  | `boolean`          | hides a familiar display in Compare; it stays familiar                                                                                                                                                                                                               |
+| `addCustomDisplay({ name, diagonal, width, height, tag?, isFamiliar?, distance?, scale? })` | `string \| null`   | returns the id (`c-` + 8 base-36 characters), or `null` for invalid input. An invalid `tag` is dropped. Invalid `distance` or `scale` gets the defaults. Sizes are canonical (inches, pixels)                                                                        |
+| `updateCustomDisplay({ id, ...fields })`                                                    | `boolean`          | a field not given keeps its value. `tag: undefined` removes the tag. Built-ins are refused                                                                                                                                                                           |
+| `deleteCustomDisplay(id)`                                                                   | `boolean`          | also removes the id from familiar, the baseline, Compare, settings and hidden lists                                                                                                                                                                                  |
+| `hideBuiltIn(id)`, `unhideBuiltIn(id)`                                                      | `boolean`          | removes a hidden built-in from the visible list and Compare. It stays familiar if it was. Custom displays are refused                                                                                                                                                |
+| `setUnits`, `setLocale`, `setPresetId`, `setVizMode`, `setSizeMatchBy`, `setView`           | `boolean`          | value must be in the allowed list. `setLocale` writes the shared `locale` signal                                                                                                                                                                                     |
+| `addCustomScale(scale)`, `removeCustomScale(scale)`                                         | `boolean`          | factors 0.5–4, rounded to 4 decimals; the list stays unique and sorted                                                                                                                                                                                               |
+| `setComfort(patch)`                                                                         | `boolean`          | partial merge (F7, F23). Refused when a minimum is above its maximum                                                                                                                                                                                                 |
+| `setFilters(patch)`                                                                         | `boolean`          | partial merge (F8, F9). An invalid field keeps its value                                                                                                                                                                                                             |
+| `setSort({ key, direction? })`                                                              | `boolean`          | without `direction`, the same key toggles it. A new key starts `asc` for `name` and `desc` otherwise (F5)                                                                                                                                                            |
+| `completeOnboarding()`                                                                      | `boolean`          | needs at least one familiar display (F2)                                                                                                                                                                                                                             |
+| `exportJson()`                                                                              | `string`           | pretty JSON: `{ app: 'pixely', version: 1, customDisplays, familiar, baselineId }`, inputs only (F18)                                                                                                                                                                |
+| `importJson(text)`                                                                          | `{ isOk, error? }` | `error` is `'invalidJson'` or `'invalidFormat'`. Any invalid item refuses the whole file. Custom displays and familiar entries merge by id; the incoming value wins. Entries for unknown displays are dropped. Sets `isOnboarded` when the familiar set is not empty |
+| `scaleOptionsFor(display)`                                                                  | `ScaleOption[]`    | the scale list for a display under the current preset and custom scales (F21)                                                                                                                                                                                        |
+| `getViewState()`                                                                            | `ViewState`        | what the link carries (F19). Only the custom displays that the familiar set or Compare refers to                                                                                                                                                                     |
+| `hydrate()`                                                                                 | `Promise<void>`    | idempotent; see below                                                                                                                                                                                                                                                |
+| `keepSharedView()`                                                                          | `boolean`          | ends the shared view and persists the state (see below)                                                                                                                                                                                                              |
+| `discardSharedView()`                                                                       | `Promise<boolean>` | reloads the stored state and clears the shared comparison (compare set, candidate settings, hidden familiar ids)                                                                                                                                                     |
+| `flush()`                                                                                   | `Promise<void>`    | writes pending storage and URL changes now, and resolves when the storage writes finish. Tests use it instead of timers                                                                                                                                              |
+| `dispose()`                                                                                 | `void`             | stops the persistence and URL effects                                                                                                                                                                                                                                |
+
+### Invariants
+
+`commit` runs after every change to the familiar set, the custom displays or the hidden
+lists. It applies `reconcileState` (in `selectors.js`) in the same batch, so these hold after
+every action:
+
+- When `familiar` is not empty, `baselineId` is one of its ids. When it is empty, `baselineId` is `null`.
+- Every familiar id, and every compare id, is a known display. Duplicates are removed.
+- `compareIds` never contains a hidden built-in. A familiar id may appear there, because Compare shows it once.
+- `compareSettings` has keys only for candidates in `compareIds` that are not familiar.
+- `hiddenFamiliarIds` ⊆ familiar ids. `hiddenBuiltInIds` ⊆ built-in ids.
+
+### Hydration
+
+`hydrate()` runs once, in this order:
+
+1. Load the stored state (`loadPersisted`). Set the persisted fields, and the preferences with
+   their defaults: `units` `metric`, the comfort window, `sizeMatchBy` `height`, `vizMode` `physical`.
+2. Locale: the stored value, else `detectLang()`. Preset: the stored value, else `detectPreset()`.
+3. Decode `location.hash` with `decodeState`. Apply every field the link carries over the
+   stored values, including `locale`, `presetId` and `units`.
+4. Run `commit({})` to repair the invariants.
+5. `isHydrated = true`, then start the effects.
+
+### Shared links and persistence
+
+**Shared view (F19).** A link is a shared view only when it carries a familiar set that differs
+from the stored one. The comparison rounds distances to 2 decimals and scales to 4, as the link
+does, and also compares the baseline. This matters for the user's own reload: the link holds the
+rounded copy of the user's own set, and that must not replace the stored values. When a link is
+a shared view:
+
+- The link's familiar set and baseline replace the in-memory ones. Its custom displays are
+  added in memory, replacing a stored display with the same id. An embedded id that matches a
+  built-in is ignored. `isOnboarded` is `true` for the session. `isSharedView` is `true`.
+- While `isSharedView` is `true`, the familiar set, the baseline, the custom displays and
+  `isOnboarded` are not written to storage. Preferences and `hiddenBuiltInIds` still are.
+- Reloading the page keeps the shared view, because the link still differs from the stored set.
+
+**Effects.** Both are queued in a microtask, so one tick of changes makes one write:
+
+- Persistence writes `{ preferences, hiddenBuiltInIds, … }` through `savePersisted`. The
+  preferences are `units`, `locale`, `presetId`, `customScales`, `comfort`, `sizeMatchBy` and
+  `vizMode`. `view`, `filters`, `sort`, `compareIds`, `compareSettings` and `hiddenFamiliarIds`
+  are not persisted. They travel in the link only.
+- The URL effect replaces the hash with `encodeState(getViewState())`, when it differs.
+
+Storage failures are the storage module's business: `savePersisted` never rejects.
+
+### Decisions
+
+- `familiarRows`, `scaleOptionsFor`, `getViewState`, `flush`, `dispose` and the
+  `discardSharedView` clearing of the compare set were added to the wave-2 sketch.
+- Familiar displays are filtered in `browseRows` like every other display. The familiar strip
+  (`familiarRows`) is not filtered, so it always shows the whole familiar set.
+- An untagged display counts as a monitor in the tag filter.
+- Search splits the query into words. Each word must appear, ignoring case, diacritics and
+  inch marks, in the name, the resolution (`3840×2160` or `3840x2160`) or the diagonal.
+- Names sort with the collation of the current locale, numbers numerically. Rows without a
+  value (no baseline, no measurable scale) sort last in both directions. Ties go by name, then id.
+- Custom and imported distances are inches and scales are factors, as everywhere in the store.
+  The UI converts.
 
 ## Components (waves 2–3)
 
