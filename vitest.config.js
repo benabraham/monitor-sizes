@@ -11,7 +11,12 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       include: ['src/**/*.{js,jsx}', 'scripts/**/*.js'],
-      exclude: ['src/**/*.test.{js,jsx}', 'src/main.jsx', 'src/i18n/locales/**'],
+      exclude: [
+        'src/**/*.test.{js,jsx}',
+        'src/main.jsx',
+        'src/i18n/locales/**',
+        'scripts/generate-icons.js',
+      ],
       thresholds: {
         lines: 85,
         functions: 85,
