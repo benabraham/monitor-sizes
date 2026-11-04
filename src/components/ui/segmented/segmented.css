@@ -1,0 +1,87 @@
+/*
+ * Segmented control. The native radios are hidden but stay focusable; the focus
+ * ring is drawn on the segment label. The selected segment is filled with the
+ * accent colour, and the checked state itself comes from the native radio.
+ */
+
+.segmented {
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.segmented__legend {
+  padding: 0;
+  margin-block-end: var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.segmented__options {
+  display: inline-flex;
+  flex-wrap: wrap;
+  max-inline-size: 100%;
+  overflow: hidden;
+  border: 1px solid var(--color-control);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+}
+
+.segmented__option {
+  position: relative;
+  display: inline-flex;
+}
+
+.segmented__option + .segmented__option .segmented__text {
+  border-inline-start: 1px solid var(--color-control);
+}
+
+.segmented__input {
+  position: absolute;
+  inset: 0;
+  inline-size: 1px;
+  block-size: 1px;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.segmented__input:focus-visible {
+  outline: none;
+}
+
+.segmented__text {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 36px;
+  padding-inline: var(--space-3);
+  color: var(--color-text);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+}
+
+@media (hover: hover) {
+  .segmented__input:not(:checked):not(:disabled) + .segmented__text:hover {
+    background-color: var(--color-surface-2);
+  }
+}
+
+.segmented__input:checked + .segmented__text {
+  background-color: var(--color-accent);
+  color: var(--color-accent-contrast);
+}
+
+.segmented__input:focus-visible + .segmented__text {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: calc(-1 * var(--focus-ring-width));
+}
+
+.segmented__input:disabled + .segmented__text {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

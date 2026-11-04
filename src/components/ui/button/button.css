@@ -1,0 +1,109 @@
+/*
+ * Button. Variants set four custom properties (bg, fg, border, hover bg); the base
+ * rule reads them. Heights: sm 28 px, md 36 px (both above the 24 px WCAG 2.5.8
+ * minimum); md grows to 44 px on coarse pointers.
+ */
+
+.button {
+  --button-bg: var(--color-surface);
+  --button-fg: var(--color-text);
+  --button-border: var(--color-control);
+  --button-bg-hover: var(--color-surface-2);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-block-size: 36px;
+  padding-inline: var(--space-3);
+  border: 1px solid var(--button-border);
+  border-radius: var(--radius-md);
+  background-color: var(--button-bg);
+  color: var(--button-fg);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  line-height: 1;
+  white-space: nowrap;
+  user-select: none;
+  transition:
+    background-color var(--duration-fast),
+    border-color var(--duration-fast);
+}
+
+.button--md {
+  min-block-size: 36px;
+}
+
+.button--sm {
+  min-block-size: 28px;
+  padding-inline: var(--space-2);
+  font-size: var(--font-size-sm);
+}
+
+.button--icon-only.button--md {
+  inline-size: 36px;
+  padding-inline: 0;
+}
+
+.button--icon-only.button--sm {
+  inline-size: 28px;
+  padding-inline: 0;
+}
+
+.button--primary {
+  --button-bg: var(--color-accent);
+  --button-fg: var(--color-accent-contrast);
+  --button-border: var(--color-accent);
+  --button-bg-hover: var(--color-accent-hover);
+}
+
+.button--secondary {
+  --button-bg: var(--color-surface);
+  --button-fg: var(--color-text);
+  --button-border: var(--color-control);
+  --button-bg-hover: var(--color-surface-2);
+}
+
+.button--ghost {
+  --button-bg: transparent;
+  --button-fg: var(--color-text-muted);
+  --button-border: transparent;
+  --button-bg-hover: var(--color-surface-2);
+}
+
+.button--danger {
+  --button-bg: var(--color-negative);
+  --button-fg: var(--color-negative-contrast);
+  --button-border: var(--color-negative);
+  --button-bg-hover: color-mix(in srgb, var(--color-negative), var(--color-text) 15%);
+}
+
+.button__icon {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.button__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (hover: hover) {
+  .button:hover:not(:disabled) {
+    background-color: var(--button-bg-hover);
+  }
+}
+
+.button:disabled {
+  opacity: 0.5;
+}
+
+@media (pointer: coarse) {
+  .button--md {
+    min-block-size: 44px;
+  }
+
+  .button--icon-only.button--md {
+    inline-size: 44px;
+  }
+}

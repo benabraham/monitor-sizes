@@ -1,0 +1,73 @@
+/*
+ * Chip. Static chips are spans; toggle chips are buttons (`.chip--toggle`).
+ * Roles: selected → accent-subtle fill; baseline (`--accent`) → accent outline;
+ * familiar (`--dashed`) → dashed familiar outline.
+ */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  max-inline-size: 100%;
+  min-block-size: 28px;
+  padding-block: var(--space-1);
+  padding-inline: var(--space-2);
+  border: 1px solid var(--color-control);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  font-variant-numeric: var(--font-numeric);
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.chip--toggle {
+  cursor: pointer;
+  font-family: inherit;
+  transition:
+    background-color var(--duration-fast),
+    border-color var(--duration-fast);
+}
+
+@media (hover: hover) {
+  .chip--toggle:hover {
+    background-color: var(--color-surface-2);
+  }
+}
+
+.chip__icon {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.chip__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chip--selected {
+  background-color: var(--color-accent-subtle);
+  color: var(--color-accent-subtle-text);
+  border-color: var(--color-accent);
+}
+
+.chip--accent {
+  border-color: var(--color-accent);
+  border-width: 2px;
+}
+
+.chip--accent:not(.chip--selected) {
+  color: var(--color-accent);
+}
+
+.chip--dashed {
+  border-style: dashed;
+  border-color: var(--color-familiar);
+}
+
+.chip--toggle:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
