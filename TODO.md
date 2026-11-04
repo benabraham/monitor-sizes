@@ -29,17 +29,18 @@ items are sub-tasks. Keep this file current — rules in [`CLAUDE.md`](./CLAUDE.
 ## Wave 2 — state and UI foundation
 
 - [x] Design tokens, global CSS, UI primitives, help popover
-- [ ] `state/store.js` (signals, computed rows, actions, persistence, URL sync)
-  - [ ] Locale precedence: URL → saved preference → `detectLocale()`
-  - [ ] Baseline enforcement: exactly one, from the familiar set (F3)
-- [ ] App shell + toolbar (units, language, preset, custom scales, comfort window, copy link)
+- [x] `state/store.js` (signals, computed rows, actions, persistence, URL sync)
+  - [x] Locale precedence: URL → saved preference → `detectLocale()`
+  - [x] Baseline enforcement: exactly one, from the familiar set (F3)
+- [ ] App shell wiring store ⇄ components
+  - [x] Header, settings panel, copy link, shared-view banner (presentational)
 
 ## Wave 3 — feature views
 
 - [ ] Onboarding: pick ≥ 1 familiar display, distance + scale each, units (F2)
 - [ ] Browse: familiar strip, search/filters, sortable table / phone cards (F4, F5, F8, F9)
 - [ ] Compare: always-visible visualization, Physical ⇄ As seen (F10–F13)
-  - [ ] Distance + scale controls, match buttons, equivalence line (F15)
+  - [x] Distance + scale controls, match buttons, equivalence line (F15)
 - [ ] Compare: metric grid incl. angular metrics, full scaling matrix (F6, F14)
 - [ ] Add/edit/delete custom display, live preview, presets (F17)
 - [ ] Import/export JSON (F18)
