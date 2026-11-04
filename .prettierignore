@@ -1,0 +1,6 @@
+dist
+coverage
+pnpm-lock.yaml
+data/sheet-snapshot/*.json
+playwright-report
+test-results

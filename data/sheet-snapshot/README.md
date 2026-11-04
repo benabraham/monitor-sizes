@@ -7,10 +7,10 @@ so this snapshot is the source for:
 - the one-off import script that produces the seed JSON (inputs only), and
 - the acceptance test fixture: "every row and metric within rounding tolerance".
 
-| File | Content |
-| --- | --- |
+| File                   | Content                                                                             |
+| ---------------------- | ----------------------------------------------------------------------------------- |
 | `monitory.values.json` | `monitory!A1:AK54`, **formatted** (displayed) values, as returned by the Sheets API |
-| `halp.values.json` | `halp!A1:B14`, the column help texts (for F20 inline help) |
+| `halp.values.json`     | `halp!A1:B14`, the column help texts (for F20 inline help)                          |
 
 Source: spreadsheet `1Jq71Vv9gIGEDGw447YJmRM9YGESWHb0cCMSFMyRgcDc`.
 
@@ -26,29 +26,29 @@ Source: spreadsheet `1Jq71Vv9gIGEDGw447YJmRM9YGESWHb0cCMSFMyRgcDc`.
 
 ## Formulas (row 4 shown; `ref` = `XLOOKUP(TRUE, $A:$A, col, 0)`)
 
-| Col | Metric | Formula |
-| --- | --- | --- |
-| C | PPI | `SQRT(G² + I²) / B` |
-| D | relative px size | `ref(C) / C − 1` |
-| F | aspect | `IFS` chain on float equality of `G/I`: 16/9 → ` 16:9 `, 21/9 → ` 21:9 `, 64/27 and 43/18 → `“21:9”`, 32/9 → ` 32:9 `, 16/10 → ` 16:10`, 21/10 → ` 21:10`, 24/10 → ` 24:10`, 32/10 → ` 32:10`, `1.5 < r < 1.6` → ` “16:9”`; else the raw ratio |
-| J, L | width, height cm | `G / C × 2.54`, `I / C × 2.54` |
-| M, O | width, height diff | `J − ref(J)`, `L − ref(L)` |
-| P | area dm² | `L × J / 100` |
-| Q | area ratio | `ABS(P / ref(P)) − 1` |
-| R | Mpix | `I × G / 10⁶` |
-| S | Mpix ratio | `ABS(R / ref(R)) − 1` |
-| T… | logical res at s | if `G/s ≥ minWidth` and `minPPI ≤ C/s ≤ maxPPI`: `ROUND(G/s, −1) & " × " & ROUND(I/s, −1)`, else blank |
-| U… | "like" PPI | `ROUND(C/s, 0)` when the scale is comfortable |
-| V… | "like" Mpix | `R / s`, blank if `< 5` (the bug the PRD fixes: should be `R / s²`, no cut-off) |
+| Col  | Metric             | Formula                                                                                                                                                                                                                                  |
+| ---- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| C    | PPI                | `SQRT(G² + I²) / B`                                                                                                                                                                                                                      |
+| D    | relative px size   | `ref(C) / C − 1`                                                                                                                                                                                                                         |
+| F    | aspect             | `IFS` chain on float equality of `G/I`: 16/9 → `16:9`, 21/9 → `21:9`, 64/27 and 43/18 → `“21:9”`, 32/9 → `32:9`, 16/10 → ` 16:10`, 21/10 → ` 21:10`, 24/10 → ` 24:10`, 32/10 → ` 32:10`, `1.5 < r < 1.6` → ` “16:9”`; else the raw ratio |
+| J, L | width, height cm   | `G / C × 2.54`, `I / C × 2.54`                                                                                                                                                                                                           |
+| M, O | width, height diff | `J − ref(J)`, `L − ref(L)`                                                                                                                                                                                                               |
+| P    | area dm²           | `L × J / 100`                                                                                                                                                                                                                            |
+| Q    | area ratio         | `ABS(P / ref(P)) − 1`                                                                                                                                                                                                                    |
+| R    | Mpix               | `I × G / 10⁶`                                                                                                                                                                                                                            |
+| S    | Mpix ratio         | `ABS(R / ref(R)) − 1`                                                                                                                                                                                                                    |
+| T…   | logical res at s   | if `G/s ≥ minWidth` and `minPPI ≤ C/s ≤ maxPPI`: `ROUND(G/s, −1) & " × " & ROUND(I/s, −1)`, else blank                                                                                                                                   |
+| U…   | "like" PPI         | `ROUND(C/s, 0)` when the scale is comfortable                                                                                                                                                                                            |
+| V…   | "like" Mpix        | `R / s`, blank if `< 5` (the bug the PRD fixes: should be `R / s²`, no cut-off)                                                                                                                                                          |
 
 ## Number formats
 
-| Columns | Pattern | Renders as |
-| --- | --- | --- |
-| C, J, L, P, U… | `0` | integer |
-| R, V… | `0.0` | 1 decimal |
-| D, Q, S | `+0 %[Color10];−0 %[Color53];"same"` | `+2 %` green, `−58 %` red, `same` |
-| M, O | `+ 0;− 0;"same"` | `+ 2`, `− 58` (space after sign), `same` |
+| Columns        | Pattern                              | Renders as                               |
+| -------------- | ------------------------------------ | ---------------------------------------- |
+| C, J, L, P, U… | `0`                                  | integer                                  |
+| R, V…          | `0.0`                                | 1 decimal                                |
+| D, Q, S        | `+0 %[Color10];−0 %[Color53];"same"` | `+2 %` green, `−58 %` red, `same`        |
+| M, O           | `+ 0;− 0;"same"`                     | `+ 2`, `− 58` (space after sign), `same` |
 
 The minus sign is U+2212 (`−`), not a hyphen. In Sheets the `"same"` section applies only
 when the value is **exactly** 0. A value like 0.004 would render as `+0 %`.
