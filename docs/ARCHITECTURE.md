@@ -43,7 +43,7 @@ src/
     url-state.js            view state ⇄ URL hash
     storage.js              IndexedDB persistence (never throws)
   i18n/
-    index.js                locale signal, t(), auto-loads locales via import.meta.glob
+    index.js                locale signal, t(), loadLocale(): one lazy chunk per language
     locales/{en,cs}/<namespace>.js   one file per namespace per language
   state/
     store.js                signals, computed values, actions (wave 2)
