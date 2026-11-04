@@ -72,6 +72,8 @@ describe('announceCompareChange', () => {
   })
 
   it('does not fail where the device cannot vibrate', () => {
-    expect(() => announceCompareChange({ name: 'Studio', isNowCompared: true })).not.toThrow()
+    expect(() =>
+      announceCompareChange({ name: 'Studio', isNowCompared: true }),
+    ).not.toThrow()
   })
 })

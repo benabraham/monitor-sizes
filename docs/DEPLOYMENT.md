@@ -138,6 +138,7 @@ for `http://localhost:4173/monitor-sizes/`.
 `pnpm size` measures the **first load** and fails when it exceeds 51200 bytes (50 kB, where
 1 kB is 1024 bytes). It reads `dist/`, so it needs a build first. With no build, or with a
 build that has no locale catalogue, it fails with a message, so it cannot pass silently.
+To measure a build made into another folder, run `pnpm size -- --dir <folder>`.
 
 The first load is what the browser downloads before first paint:
 
@@ -150,27 +151,40 @@ The first load is what the browser downloads before first paint:
   `src/i18n/locales/`.
 
 Lazy chunks are listed in a second table and are **not** counted. They are the other language,
-and the code that only some views need, such as the Compare data. They load on first use, and
-Workbox precaches them, so they work offline (see [`I18N.md`](./I18N.md), "Loading the
-catalogues"). Output looks like this, with the numbers of the build at the time of writing:
+and the views and dialogs that a first paint does not need: onboarding, the Compare view and
+its data, the display actions, the Add display dialog, and the settings dialog with its data
+transfer. Each loads the first time it is wanted, through `useLazyModule`
+(`src/lib/use-lazy-module.js`, used in `src/app.jsx`). Workbox precaches them, so they work
+offline (see [`I18N.md`](./I18N.md), "Loading the catalogues"). The shared chunk named
+`button-*.js` holds the Preact runtime and the icons that the entry and the lazy chunks both
+use. Output looks like this, with the numbers of the build at the time of writing:
 
 ```
 First load (counted)
 File                                      Gzip
 ----------------------------------------------
-index-jhOfQgK1.js                     42.16 kB
-registerSW.js                          0.13 kB
-cs-DkMpqxj6.js  (largest locale)       6.07 kB
+index-D0EpYqZK.js                     25.53 kB
 rolldown-runtime-DK3Fl9T5.js           0.15 kB
+button-ChYhX0pc.js                     6.88 kB
+format-CSVUwSdG.js                     0.89 kB
+registerSW.js                          0.13 kB
+cs-CWqgBfNX.js  (largest locale)       6.10 kB
 ----------------------------------------------
-Total                                 48.51 kB
+Total                                 39.69 kB
 
 Lazy, loaded on demand (not counted)
 ----------------------------------------------
-compare-data-CuIVQNdA.js               2.67 kB
-en-BDNPIRX4.js                         5.37 kB
+add-display-dialog-Y1M86xQP.js         0.28 kB
+add-display-form-L0VoIQB8.js           3.36 kB
+compare-data-DEbxoIPb.js               2.71 kB
+compare-view-BZpnEQqR.js               4.96 kB
+data-transfer-Ddrl4-DM.js              0.95 kB
+display-actions-DzFQCJVe.js            0.93 kB
+en-D5LiQkIm.js                         5.40 kB
+onboarding-dMBmPe-p.js                 2.38 kB
+settings-panel-BWicen1V.js             2.07 kB
 
-OK: 48.51 kB of 50.00 kB budget
+OK: 39.69 kB of 50.00 kB budget
 ```
 
 Service-worker and Workbox files (`sw.js`, `workbox-*.js`) are excluded, because Workbox
@@ -178,8 +192,9 @@ writes them outside the app's own chunks.
 
 If a legitimate change pushes the bundle over budget, do not raise the budget in the same
 change. Find out what grew first. The budget is the PRD's, and changing it needs a PRD decision.
-The cheapest lever is to load a view that only some users open on demand, as the Compare data
-already is (`src/components/compare-view/compare-view.jsx`).
+The cheapest lever is to load a view or dialog that only some visits open on demand, as the
+Compare view and the dialogs already are (`useLazyModule` in `src/app.jsx`). Before these
+were lazy, the first load was 48.51 kB.
 
 The unit tests for the guard live in `scripts/check-bundle-size.test.js`:
 

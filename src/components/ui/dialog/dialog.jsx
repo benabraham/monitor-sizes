@@ -5,6 +5,23 @@ import './dialog.css'
 /** Counter for unique title ids, one per mounted dialog. */
 let dialogSequence = 0
 
+/** Elements that Tab can reach. Disabled and hidden-input elements are filtered out below. */
+const FOCUSABLE =
+  'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+
+/**
+ * The controls inside a dialog that Tab can reach, in document order. Controls in a
+ * `hidden` subtree are left out.
+ *
+ * @param {HTMLElement} element
+ * @returns {HTMLElement[]}
+ *
+ * @example
+ * focusableIn(dialogElement) // [closeButton, input, saveButton]
+ */
+const focusableIn = (element) =>
+  [...element.querySelectorAll(FOCUSABLE)].filter((node) => !node.closest('[hidden]'))
+
 /**
  * Open the dialog modally. Falls back to the `open` attribute where `showModal`
  * is missing (jsdom, very old engines).
@@ -45,6 +62,8 @@ const closeDialog = (element) => {
  * - Full-screen sheet below 600 px wide, centred card above.
  * - Focus moves into the dialog on open and returns to the opener on close, as
  *   the browser does for `showModal()`.
+ * - Tab and Shift+Tab stay inside the dialog. A modal dialog does not stop focus from
+ *   leaving at its last control, so the first and last controls wrap to each other.
  *
  * @param {object} props
  * @param {boolean} props.isOpen Whether the dialog is shown.
@@ -125,6 +144,28 @@ export const Dialog = ({
   }, [onClose])
 
   /**
+   * Tab from the last control moves to the first, and Shift+Tab from the first to the last.
+   * Other keys, and controls in between, keep the browser's own focus order.
+   *
+   * @param {KeyboardEvent} event
+   */
+  const handleKeyDown = (event) => {
+    if (event.key !== 'Tab') return
+    const controls = focusableIn(dialogRef.current)
+    if (controls.length === 0) return
+    const first = controls[0]
+    const last = controls[controls.length - 1]
+    const active = document.activeElement
+    if (event.shiftKey && active === first) {
+      event.preventDefault()
+      last.focus()
+    } else if (!event.shiftKey && active === last) {
+      event.preventDefault()
+      first.focus()
+    }
+  }
+
+  /**
    * A click whose target is the `<dialog>` itself lands on the backdrop, because
    * the panel covers the whole content box.
    *
@@ -141,6 +182,7 @@ export const Dialog = ({
       class="dialog"
       aria-labelledby={titleId}
       onClick={handleBackdropClick}
+      onKeyDown={handleKeyDown}
     >
       <div class="dialog__panel">
         <header class="dialog__header">

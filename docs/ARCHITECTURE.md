@@ -546,6 +546,19 @@ Storage failures are the storage module's business: `savePersisted` never reject
 | `add-display`    | 3    | four-field form, live preview, resolution presets, "I know this one"                                                          |
 | `onboarding`     | 3    | first-run: pick ≥ 1 familiar display (or add one), distance + scale each, units                                               |
 
+**Lazy chunks.** Onboarding, the Compare view, the display actions dialog, the Add display dialog
+and the settings dialog are loaded the first time they are wanted, through `useLazyModule`
+(`src/lib/use-lazy-module.js`). The loaders sit at the top of `src/app.jsx`, and the dialogs
+mount once their chunk has arrived. The Add display chunk is also prefetched on a hover or focus
+of an Add button, and when the browser is idle. The service worker precaches every chunk, so each
+works offline after the first visit. Sizes and the budget: [`DEPLOYMENT.md`](./DEPLOYMENT.md),
+"Bundle size".
+
+**Compare by long press.** A press of at least 500 ms with a finger or a pen, moving no more than
+10 px, on a Browse card or table row toggles its comparison, with a spoken message and a short
+vibration. The hook is `browse/use-long-press.js`, and the feedback is `browse/compare-feedback.js`.
+A familiar display is hidden or shown in Compare, as its checkbox does.
+
 ## Testing strategy
 
 - `lib/**`: TDD, ~100 % coverage. The sheet snapshot (`data/sheet-snapshot/`) is the

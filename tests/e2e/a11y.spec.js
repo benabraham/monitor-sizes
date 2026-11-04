@@ -6,6 +6,7 @@ import {
   STEP1_TITLE,
   addToCompare,
   completeOnboarding,
+  expectBrowse,
   goToView,
   openAddDisplay,
   openSettings,
@@ -106,8 +107,11 @@ for (const colorScheme of /** @type {const} */ (['light', 'dark'])) {
 test.describe('keyboard', () => {
   test('from the page start, Tab reaches the skip link, then the view switch', async ({ page }) => {
     await completeOnboarding({ page })
+    // A fresh load starts focus at the top of the document. After onboarding, the view
+    // heading holds focus, so the Tab order would begin after it.
+    await page.reload()
+    await expectBrowse(page)
 
-    await page.evaluate(() => document.activeElement?.blur())
     await page.keyboard.press('Tab')
     const skip = page.getByRole('link', { name: 'Skip to content' })
     await expect(skip).toBeFocused()
@@ -120,7 +124,8 @@ test.describe('keyboard', () => {
 
   test('the skip link moves focus to the main content', async ({ page }) => {
     await completeOnboarding({ page })
-    await page.evaluate(() => document.activeElement?.blur())
+    await page.reload()
+    await expectBrowse(page)
     await page.keyboard.press('Tab')
     await page.keyboard.press('Enter')
 
