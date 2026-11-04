@@ -393,7 +393,10 @@ describe('parseDistDir', () => {
   })
 
   it('measures the folder given after --dir, as an absolute path', () => {
-    const dir = parseDistDir({ argv: ['--dir', 'scratch/dist-b'], defaultDir: '/app/dist' })
+    const dir = parseDistDir({
+      argv: ['--dir', 'scratch/dist-b'],
+      defaultDir: '/app/dist',
+    })
 
     expect(dir).toBe(join(process.cwd(), 'scratch/dist-b'))
   })

@@ -231,7 +231,11 @@ describe('useLongPress: pointer types', () => {
     const onLongPress = vi.fn()
     render(<Target onLongPress={onLongPress} />)
 
-    fireEvent.pointerDown(getTarget(), { pointerType: 'mouse', isPrimary: true, button: 0 })
+    fireEvent.pointerDown(getTarget(), {
+      pointerType: 'mouse',
+      isPrimary: true,
+      button: 0,
+    })
     vi.advanceTimersByTime(1000)
 
     expect(onLongPress).not.toHaveBeenCalled()

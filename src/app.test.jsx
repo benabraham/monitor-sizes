@@ -536,3 +536,37 @@ describe('Compare from Browse', () => {
     expect(store.compareIds.value).toEqual([UW.id])
   })
 })
+
+describe('Add display prefetch', () => {
+  afterEach(() => {
+    delete globalThis.requestIdleCallback
+    delete globalThis.cancelIdleCallback
+  })
+
+  it('prefetches the Add display dialog when the browser is idle, and still opens it on the click', async () => {
+    const user = userEvent.setup()
+    const requestIdleCallback = vi.fn((callback) => {
+      callback()
+      return 1
+    })
+    globalThis.requestIdleCallback = requestIdleCallback
+    globalThis.cancelIdleCallback = vi.fn()
+    renderApp({ stored: ONBOARDED })
+    await waitForView('Browse')
+
+    await waitFor(() => expect(requestIdleCallback).toHaveBeenCalledTimes(1))
+    await user.click(document.querySelector('.app-header__add'))
+    expect(await screen.findByRole('dialog', { name: 'Add display' })).not.toBeNull()
+  })
+
+  it('prefetches on a hover of the header Add button, and the dialog still opens', async () => {
+    const user = userEvent.setup()
+    renderApp({ stored: ONBOARDED })
+    await waitForView('Browse')
+
+    fireEvent.pointerOver(document.querySelector('.app-header__add'))
+    await user.click(document.querySelector('.app-header__add'))
+
+    expect(await screen.findByRole('dialog', { name: 'Add display' })).not.toBeNull()
+  })
+})

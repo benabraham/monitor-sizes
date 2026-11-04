@@ -147,4 +147,39 @@ describe('Dialog', () => {
     expect(container.querySelector('.dialog__footer')).not.toBeNull()
     expect(screen.getByRole('button', { name: 'Save' })).not.toBeNull()
   })
+  it('wraps Tab from the last control to the first, and Shift+Tab back', () => {
+    render(
+      <Dialog
+        isOpen
+        title="Trap"
+        onClose={() => {}}
+        footer={<button>Save</button>}
+      >
+        <button>Middle</button>
+      </Dialog>,
+    )
+    const close = screen.getByRole('button', { name: 'Close' })
+    const save = screen.getByRole('button', { name: 'Save' })
+
+    save.focus()
+    fireEvent.keyDown(save, { key: 'Tab' })
+    expect(document.activeElement).toBe(close)
+
+    fireEvent.keyDown(close, { key: 'Tab', shiftKey: true })
+    expect(document.activeElement).toBe(save)
+  })
+
+  it('leaves Tab between controls in the middle of the dialog to the browser', () => {
+    render(
+      <Dialog isOpen title="Middle" onClose={() => {}} footer={<button>Save</button>}>
+        <button>Middle</button>
+      </Dialog>,
+    )
+    const middle = screen.getByRole('button', { name: 'Middle' })
+
+    middle.focus()
+    const notPrevented = fireEvent.keyDown(middle, { key: 'Tab' })
+    expect(notPrevented).toBe(true)
+    expect(document.activeElement).toBe(middle)
+  })
 })

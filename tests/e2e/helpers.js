@@ -105,7 +105,7 @@ export const completeOnboarding = async ({
     if (!values) continue
     const row = page.getByRole('group', { name: startsWith(display.name) })
     if (values.distance !== undefined) {
-      await row.getByRole('textbox', { name: 'Distance' }).fill(String(values.distance))
+      await fillNumber(row.getByRole('textbox', { name: 'Distance' }), String(values.distance))
     }
     if (values.scale !== undefined) {
       await row.getByRole('combobox', { name: 'Scale' }).selectOption(String(values.scale))
@@ -178,7 +178,7 @@ export const openAddDisplay = async (page) => {
  * await displayItem(page, DISPLAYS.uhd27).getByRole('checkbox').check()
  */
 export const displayItem = (page, { name, diagonal }) => {
-  const nameMatch = new RegExp(`^(Baseline )?${escapeRegExp(name)}$`)
+  const nameMatch = new RegExp(`^(Baseline )?${escapeRegExp(name)}( Custom)?$`)
   if (isNarrow(page)) {
     return page
       .getByRole('listitem')
@@ -219,6 +219,19 @@ export const openDisplayActions = async (page, display) => {
 }
 
 /**
+ * Types a number into a number field and leaves the field. The field commits its value on
+ * blur (see number-field.jsx), so the blur is part of typing a value.
+ *
+ * @param {import('@playwright/test').Locator} field
+ * @param {string} value
+ * @returns {Promise<void>}
+ */
+export const fillNumber = async (field, value) => {
+  await field.fill(value)
+  await field.blur()
+}
+
+/**
  * Fills the Add display form and submits it. Only the fields given are changed, so a
  * dialog can be filled in steps.
  *
@@ -243,11 +256,11 @@ export const fillAddDisplay = async ({
 }) => {
   if (name !== undefined) await dialog.getByRole('textbox', { name: 'Name' }).fill(name)
   if (diagonal !== undefined) {
-    await dialog.getByRole('textbox', { name: 'Diagonal' }).fill(diagonal)
+    await fillNumber(dialog.getByRole('textbox', { name: 'Diagonal' }), diagonal)
   }
-  if (width !== undefined) await dialog.getByRole('textbox', { name: 'Width' }).fill(width)
+  if (width !== undefined) await fillNumber(dialog.getByRole('textbox', { name: 'Width' }), width)
   if (height !== undefined) {
-    await dialog.getByRole('textbox', { name: 'Height' }).fill(height)
+    await fillNumber(dialog.getByRole('textbox', { name: 'Height' }), height)
   }
   if (isFamiliar !== undefined) {
     const box = dialog.getByRole('checkbox', { name: 'I know this one' })
