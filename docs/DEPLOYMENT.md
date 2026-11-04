@@ -152,25 +152,25 @@ The first load is what the browser downloads before first paint:
 Lazy chunks are listed in a second table and are **not** counted. They are the other language,
 and the code that only some views need, such as the Compare data. They load on first use, and
 Workbox precaches them, so they work offline (see [`I18N.md`](./I18N.md), "Loading the
-catalogues"). Output looks like this, with the numbers of the current build:
+catalogues"). Output looks like this, with the numbers of the build at the time of writing:
 
 ```
 First load (counted)
 File                                      Gzip
 ----------------------------------------------
-index-2V2TTIoc.js                     42.08 kB
+index-jhOfQgK1.js                     42.16 kB
 registerSW.js                          0.13 kB
 cs-DkMpqxj6.js  (largest locale)       6.07 kB
 rolldown-runtime-DK3Fl9T5.js           0.15 kB
 ----------------------------------------------
-Total                                 48.44 kB
+Total                                 48.51 kB
 
 Lazy, loaded on demand (not counted)
 ----------------------------------------------
-compare-data-Y1i4xVSG.js               2.67 kB
+compare-data-CuIVQNdA.js               2.67 kB
 en-BDNPIRX4.js                         5.37 kB
 
-OK: 48.44 kB of 50.00 kB budget
+OK: 48.51 kB of 50.00 kB budget
 ```
 
 Service-worker and Workbox files (`sw.js`, `workbox-*.js`) are excluded, because Workbox

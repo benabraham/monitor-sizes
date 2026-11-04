@@ -52,15 +52,16 @@ items are sub-tasks. Keep this file current — rules in [`CLAUDE.md`](./CLAUDE.
 - [ ] Accessibility pass (keyboard, labels, contrast, text equivalent of the overlay)
 - [ ] Performance check: 200 displays recalculated < 16 ms; JS < 50 kB gzipped
   - [x] Store perf test: 200 displays ≈ 2 ms
-  - [ ] Bundle back under 50 kB (lazy per-locale catalogues; was 53.5 kB)
+  - [x] Bundle back under 50 kB (lazy per-locale catalogues + lazy compare data; 53.5 → 48.5 kB)
+  - [ ] More headroom: lazy-load onboarding, settings and add-display dialogs
 - [ ] README with screenshots and user guide
   - [x] README, USER-GUIDE (en, cs), CALCULATIONS
   - [ ] Screenshots in `docs/screenshots/`
-- [ ] Layout polish from browser review
-  - [ ] Familiar chips: separate name and diagonal
-  - [ ] Compare desktop: only the visualization sticky, controls reachable
-  - [ ] Compare phone: cap the pinned visualization height
-  - [ ] Move the `.visually-hidden` clip fix into `global.css`
+- [x] Layout polish from browser review
+  - [x] Familiar chips: separate name and diagonal
+  - [x] Compare desktop: only the visualization sticky, controls reachable
+  - [x] Compare phone: cap the pinned visualization height
+  - [x] Move the `.visually-hidden` clip fix into `global.css`
 - [ ] Optional: long-press on a display to add it to compare (PRD key interaction; checkbox already covers it)
 - [ ] Deploy to GitHub Pages
   - [x] Repo owner: make the repo public (or a plan with private Pages)
