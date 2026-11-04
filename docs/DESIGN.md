@@ -161,7 +161,8 @@ visually hidden or styled.
 - `Dialog` is a native `<dialog>`, labelled by its title. `showModal()` traps focus and returns
   it to the opener on close. Esc and backdrop clicks call `onClose`.
 - `HelpPopover` is a `?` button with `aria-label`, `aria-controls` and `aria-expanded`. The
-  panel is `role="dialog"`, labelled by its heading.
+  panel is `role="dialog"`, labelled by its title. The title is a `<p>` styled as a heading,
+  not an `h*` element, and `aria-labelledby` points at it.
 
 **Motion.** `prefers-reduced-motion: reduce` disables transitions and animations globally
 (`global.css`).
@@ -348,12 +349,12 @@ development.
 </HelpPopover>
 ```
 
-| Prop       | Notes                                                            |
-| ---------- | ---------------------------------------------------------------- |
-| `id`       | Unique id. The trigger points to the panel with `popovertarget`. |
-| `label`    | Accessible name of the `?` button, for example `"Help: PPI"`.    |
-| `title`    | Heading in the panel.                                            |
-| `children` | Explanatory text.                                                |
+| Prop       | Notes                                                                 |
+| ---------- | --------------------------------------------------------------------- |
+| `id`       | Unique id. The trigger points to the panel with `popovertarget`.      |
+| `label`    | Accessible name of the `?` button, for example `"Help: PPI"`.         |
+| `title`    | Title of the panel, styled as a heading; the panel's accessible name. |
+| `children` | Explanatory text.                                                     |
 
 Click or keyboard only. There is no hover. Esc and an outside click close the panel.
 

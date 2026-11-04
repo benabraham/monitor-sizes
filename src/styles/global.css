@@ -123,9 +123,16 @@ a {
   outline-offset: var(--focus-ring-offset);
 }
 
-/* Hides content visually but keeps it for assistive technology. */
+/*
+ * Hides content visually but keeps it for assistive technology. It is pinned to the corner of
+ * its containing block: with no positioned ancestor, the static position of text inside a
+ * scrolling table would put it at the far end of the table and widen the page. Scroll
+ * containers (`.table-wrap`) are positioned below, so they are the containing block.
+ */
 .visually-hidden {
   position: absolute !important;
+  inset-block-start: 0;
+  inset-inline-start: 0;
   inline-size: 1px !important;
   block-size: 1px !important;
   margin: -1px !important;
@@ -139,6 +146,7 @@ a {
 
 /* Tables: dense, tabular numerals, horizontal scroll inside a wrapper on phones. */
 .table-wrap {
+  position: relative;
   max-inline-size: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;

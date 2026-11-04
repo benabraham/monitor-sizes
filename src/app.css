@@ -77,14 +77,3 @@
   border-radius: var(--radius-md);
   background-color: var(--color-surface);
 }
-
-/*
- * Visually hidden text keeps its static position, so text inside a scrolling table (the
- * "Best" label of a scale chip, for example) would sit at the table's far end and widen the
- * page. Pinning it to the containing block's corner keeps it inside the clip. This belongs in
- * global.css, next to `.visually-hidden`; it lives here until that file is next changed.
- */
-.visually-hidden {
-  inset-block-start: 0;
-  inset-inline-start: 0;
-}

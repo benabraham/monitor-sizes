@@ -33,7 +33,8 @@ from the `packageManager` field in `package.json`. Both workflows install with
 2. `pnpm format:check`: Prettier, no semicolons and single quotes (`.prettierrc.json`)
 3. `pnpm coverage`: unit tests with v8 coverage and the thresholds in `vitest.config.js`
 4. `pnpm build`: production build, which also generates the service worker
-5. `pnpm size`: fails when the gzipped JavaScript in `dist/assets` exceeds 50 kB
+5. `pnpm size`: fails when the first load (the scripts `dist/index.html` loads, plus the largest
+   locale catalogue) exceeds 50 kB gzipped
 6. `pnpm exec playwright install --with-deps chromium`
 7. `pnpm e2e`: Playwright specs against `pnpm preview`
 8. On failure only: uploads `playwright-report/` as an artifact, kept 14 days
@@ -134,15 +135,51 @@ for `http://localhost:4173/monitor-sizes/`.
 
 ### Bundle size
 
-`pnpm size` reads `dist/assets/*.js`, gzips each file and prints a table. It exits with
-code 1 when the total is over 51200 bytes (50 kB, where 1 kB is 1024 bytes). It needs a
-build first. With no build it fails with a message telling you to run `pnpm build`, so
-it cannot pass silently. Service-worker and Workbox files are excluded because Workbox writes them
-outside `dist/assets`.
+`pnpm size` measures the **first load** and fails when it exceeds 51200 bytes (50 kB, where
+1 kB is 1024 bytes). It reads `dist/`, so it needs a build first. With no build, or with a
+build that has no locale catalogue, it fails with a message, so it cannot pass silently.
 
-If a legitimate change pushes the bundle over budget, do not raise the budget in the
-same change. Find out what grew first. The budget is the PRD's, and changing it needs
-a PRD decision.
+The first load is what the browser downloads before first paint:
+
+- every script that `dist/index.html` references (`<script src>` and
+  `<link rel="modulepreload">`), and every chunk those scripts import statically. This is the
+  entry chunk, the Vite runtime and the service-worker registration;
+- the **largest locale catalogue**, with the chunks it imports statically. The app loads one
+  language at start (`src/main.jsx`), so only one is counted. Vite names a chunk after its
+  folder, so a language chunk is `en-<hash>.js` or `cs-<hash>.js`, one for each folder in
+  `src/i18n/locales/`.
+
+Lazy chunks are listed in a second table and are **not** counted. They are the other language,
+and the code that only some views need, such as the Compare data. They load on first use, and
+Workbox precaches them, so they work offline (see [`I18N.md`](./I18N.md), "Loading the
+catalogues"). Output looks like this, with the numbers of the current build:
+
+```
+First load (counted)
+File                                      Gzip
+----------------------------------------------
+index-2V2TTIoc.js                     42.08 kB
+registerSW.js                          0.13 kB
+cs-DkMpqxj6.js  (largest locale)       6.07 kB
+rolldown-runtime-DK3Fl9T5.js           0.15 kB
+----------------------------------------------
+Total                                 48.44 kB
+
+Lazy, loaded on demand (not counted)
+----------------------------------------------
+compare-data-Y1i4xVSG.js               2.67 kB
+en-BDNPIRX4.js                         5.37 kB
+
+OK: 48.44 kB of 50.00 kB budget
+```
+
+Service-worker and Workbox files (`sw.js`, `workbox-*.js`) are excluded, because Workbox
+writes them outside the app's own chunks.
+
+If a legitimate change pushes the bundle over budget, do not raise the budget in the same
+change. Find out what grew first. The budget is the PRD's, and changing it needs a PRD decision.
+The cheapest lever is to load a view that only some users open on demand, as the Compare data
+already is (`src/components/compare-view/compare-view.jsx`).
 
 The unit tests for the guard live in `scripts/check-bundle-size.test.js`:
 

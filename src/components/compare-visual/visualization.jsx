@@ -188,7 +188,6 @@ export const Visualization = ({
   })
   const titleId = `${idPrefix}-title`
   const descId = `${idPrefix}-desc`
-  const sizesId = `${idPrefix}-sizes`
   const headingId = `${idPrefix}-heading`
   const bar = layout.scaleBar
   const barText =
@@ -308,27 +307,55 @@ export const Visualization = ({
         </figcaption>
       </figure>
 
-      {entries.length === 0 ? (
+      {entries.length === 0 && (
         <p class="visualization__empty">{t('compareVisual.visualization.empty')}</p>
-      ) : (
-        <section class="visualization__sizes" aria-labelledby={sizesId}>
-          <h3 class="visualization__sizes-heading" id={sizesId}>
-            {t('compareVisual.visualization.sizesHeading')}
-          </h3>
-          <ul class="visualization__sizes-list">
-            {entries.map((entry) => (
-              <li class="visualization__size" key={entry.display.id}>
-                <span class="visualization__size-name">
-                  {formatDisplayLabel({ display: entry.display, locale: currentLocale })}
-                </span>
-                <span class="visualization__size-value">
-                  {sizeTextOf({ entry, units, currentLocale, isSeen })}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </section>
       )}
+    </section>
+  )
+}
+
+/**
+ * The text equivalent of {@link Visualization}: each display with its size in the active
+ * mode and unit system. It is a separate block, so the Compare view keeps it out of the
+ * pinned drawing and lets it scroll with the controls (see `CompareVisual`).
+ *
+ * @param {object} props
+ * @param {object[]} [props.entries=[]] CompareEntry objects, in drawing order.
+ * @param {'physical'|'seen'} [props.mode='physical'] Mode, which picks the size text.
+ * @param {'metric'|'imperial'} [props.units='metric'] Unit system.
+ * @returns {import('preact').JSX.Element|null} null when there is nothing to list.
+ *
+ * @example
+ * <VisualizationSizes entries={compareEntries} mode={vizMode} units={units} />
+ */
+export const VisualizationSizes = ({
+  entries = [],
+  mode = 'physical',
+  units = 'metric',
+}) => {
+  const [idPrefix] = useState(() => `visualization-sizes-${++visualizationSequence}`)
+  if (entries.length === 0) return null
+  const headingId = `${idPrefix}-heading`
+  const currentLocale = locale.value
+  const isSeen = mode === 'seen'
+
+  return (
+    <section class="visualization__sizes" aria-labelledby={headingId}>
+      <h3 class="visualization__sizes-heading" id={headingId}>
+        {t('compareVisual.visualization.sizesHeading')}
+      </h3>
+      <ul class="visualization__sizes-list">
+        {entries.map((entry) => (
+          <li class="visualization__size" key={entry.display.id}>
+            <span class="visualization__size-name">
+              {formatDisplayLabel({ display: entry.display, locale: currentLocale })}
+            </span>
+            <span class="visualization__size-value">
+              {sizeTextOf({ entry, units, currentLocale, isSeen })}
+            </span>
+          </li>
+        ))}
+      </ul>
     </section>
   )
 }

@@ -121,8 +121,9 @@ describe('CompareView', () => {
     const store = await hydratedStore({ familiar: familiarPair })
     render(<CompareView {...viewProps({ entries: store.compareEntries.value })} />)
 
-    expect(screen.getByRole('heading', { name: 'Metrics' })).not.toBeNull()
-    expect(screen.getByRole('heading', { name: 'Scaling' })).not.toBeNull()
+    // The metric and scaling sections load on first use, so wait for them.
+    expect(await screen.findByRole('heading', { name: 'Metrics' })).not.toBeNull()
+    expect(await screen.findByRole('heading', { name: 'Scaling' })).not.toBeNull()
   })
 
   it('shows no data sections when nothing is compared', () => {

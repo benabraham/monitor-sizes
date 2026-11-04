@@ -2,13 +2,15 @@ import { locale, t } from '../../i18n/index.js'
 import { Segmented } from '../ui/index.js'
 import { DistanceControl } from './distance-control.jsx'
 import { EquivalenceLine } from './equivalence-line.jsx'
-import { Visualization } from './visualization.jsx'
+import { Visualization, VisualizationSizes } from './visualization.jsx'
 import './compare-visual.css'
 
 /**
  * The visual part of Compare (PRD UX "Compare", F10–F15): the always-visible
- * {@link Visualization} pinned at the top, the size-matching choice, and one
- * {@link DistanceControl} with its {@link EquivalenceLine} per compared display.
+ * {@link Visualization} pinned at the top, then its text sizes ({@link VisualizationSizes}),
+ * the size-matching choice, and one {@link DistanceControl} with its
+ * {@link EquivalenceLine} per compared display. Only the drawing is pinned, so the text
+ * and the controls scroll under it.
  *
  * The pinned block is sticky. The integrator can set `--compare-visual-sticky-top`
  * on an ancestor to the height of the app header, so the drawing does not go under
@@ -71,6 +73,8 @@ export const CompareVisual = ({
       </div>
 
       <div class="compare-visual__controls">
+        <VisualizationSizes entries={entries} mode={mode} units={units} />
+
         <Segmented
           name="compare-visual-size-match"
           label={t('compareVisual.sizeBy.label')}

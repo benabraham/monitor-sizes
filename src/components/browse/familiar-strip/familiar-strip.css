@@ -45,6 +45,10 @@
   font-weight: var(--font-weight-semibold);
 }
 
+.familiar-strip__sep {
+  color: var(--color-text-muted);
+}
+
 .familiar-strip__detail {
   color: var(--color-text-muted);
   font-weight: var(--font-weight-regular);

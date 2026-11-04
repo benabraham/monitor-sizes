@@ -25,8 +25,11 @@ const FamiliarChip = ({ row, lang, onSetBaseline }) => {
   if (isBaseline) {
     return (
       <Chip isAccent isSelected class="familiar-strip__chip">
-        <span class="familiar-strip__marker">{t('browse.baselineMarker')}</span>
-        <span class="familiar-strip__name">{name}</span>
+        <span class="familiar-strip__marker">{t('browse.baselineMarker')}</span>{' '}
+        <span class="familiar-strip__name">{name}</span>{' '}
+        <span class="familiar-strip__sep" aria-hidden="true">
+          ·
+        </span>{' '}
         <span class="familiar-strip__detail">{detail}</span>
       </Chip>
     )
@@ -39,7 +42,10 @@ const FamiliarChip = ({ row, lang, onSetBaseline }) => {
       title={t('browse.setBaselineHint', { name })}
       onClick={() => onSetBaseline?.(id)}
     >
-      <span class="familiar-strip__name">{name}</span>
+      <span class="familiar-strip__name">{name}</span>{' '}
+      <span class="familiar-strip__sep" aria-hidden="true">
+        ·
+      </span>{' '}
       <span class="familiar-strip__detail">{detail}</span>
     </Chip>
   )
