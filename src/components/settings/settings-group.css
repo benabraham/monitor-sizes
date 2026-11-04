@@ -1,0 +1,30 @@
+/* One settings group: heading with its help button, then the controls. */
+
+.settings-group {
+  display: grid;
+  gap: var(--space-3);
+  min-inline-size: 0;
+}
+
+.settings-group + .settings-group {
+  padding-block-start: var(--space-4);
+  border-block-start: 1px solid var(--color-border);
+}
+
+.settings-group__heading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.settings-group__title {
+  margin: 0;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+}
+
+.settings-group__body {
+  display: grid;
+  gap: var(--space-3);
+  min-inline-size: 0;
+}

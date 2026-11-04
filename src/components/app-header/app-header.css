@@ -1,0 +1,101 @@
+/*
+ * AppHeader. Sticky at the top of the page. Wide screens: one row with the nav in the
+ * middle. Phones: the brand and actions share the first row and the nav takes a full
+ * second row, so nothing overflows at 360 px.
+ */
+
+.app-header {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: var(--z-sticky);
+  background-color: var(--color-surface);
+  border-block-end: 1px solid var(--color-border);
+  padding-block-start: env(safe-area-inset-top, 0px);
+}
+
+.app-header__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-4);
+  max-inline-size: 100%;
+  padding: var(--space-2) var(--space-4);
+}
+
+.app-header__brand {
+  margin: 0;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  white-space: nowrap;
+}
+
+.app-header__name-short {
+  display: none;
+}
+
+.app-header__nav {
+  display: flex;
+  gap: var(--space-1);
+}
+
+.app-header__nav-item {
+  min-block-size: 36px;
+}
+
+.app-header__nav-item[aria-current='page'] {
+  --button-fg: var(--color-accent-subtle-text);
+  --button-bg: var(--color-accent-subtle);
+  --button-border: var(--color-accent);
+  --button-bg-hover: var(--color-accent-subtle);
+  font-weight: var(--font-weight-semibold);
+}
+
+.app-header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-inline-start: auto;
+}
+
+.app-header__add {
+  --button-fg: var(--color-accent-contrast);
+}
+
+@media (max-width: 599.98px) {
+  .app-header__bar {
+    padding-inline: var(--space-4);
+  }
+
+  .app-header__name {
+    display: none;
+  }
+
+  .app-header__name-short {
+    display: inline;
+  }
+
+  .app-header__nav {
+    order: 3;
+    inline-size: 100%;
+  }
+
+  .app-header__nav-item {
+    flex: 1 1 0;
+    min-inline-size: 0;
+  }
+
+  .app-header__label {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .app-header__add {
+    padding-inline: 0;
+    inline-size: 36px;
+  }
+}

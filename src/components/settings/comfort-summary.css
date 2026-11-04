@@ -1,0 +1,8 @@
+/* Comfort summary: a compact text button in the Browse toolbar. */
+
+.comfort-summary {
+  max-inline-size: 100%;
+  white-space: normal;
+  text-align: start;
+  font-variant-numeric: tabular-nums;
+}
