@@ -37,7 +37,7 @@ export default {
   },
   comfort: {
     title: 'Pohodlné okno',
-    help: 'Měřítko je pohodlné, když jeho efektivní PPI leží uvnitř okna a logická šířka je alespoň minimum. Pixely na stupeň navíc počítají se vzdáleností od displeje, která je u referenčního displeje.',
+    help: 'Měřítko je pohodlné, když jeho efektivní PPI leží uvnitř okna a logická šířka je alespoň minimum. Pixely na stupeň navíc počítají se vzdáleností od displeje: Procházení používá vzdálenost referenčního displeje, Porovnání vlastní vzdálenost každého displeje.',
     rule: 'Pravidlo',
     mode: {
       ppi: 'PPI',
@@ -47,7 +47,8 @@ export default {
     maxPpi: 'Maximální PPI',
     minPpd: 'Minimální px/°',
     maxPpd: 'Maximální px/°',
-    ppdHint: 'Pixely na stupeň používají vzdálenost od pohledu u referenčního displeje.',
+    ppdHint:
+      'Procházení používá vzdálenost referenčního displeje, Porovnání vlastní vzdálenost každého displeje.',
     minWidth: 'Minimální logická šířka',
     rangeError: 'Minimum nesmí být vyšší než maximum.',
   },

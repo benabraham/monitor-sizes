@@ -37,7 +37,7 @@ export default {
   },
   comfort: {
     title: 'Comfort window',
-    help: 'A scale is comfortable when its effective PPI is inside the window and its logical width is at least the minimum. Pixels per degree also counts the viewing distance, which is the baseline display’s distance.',
+    help: 'A scale is comfortable when its effective PPI is inside the window and its logical width is at least the minimum. Pixels per degree also counts the viewing distance: Browse uses the baseline display’s distance, Compare uses each display’s own distance.',
     rule: 'Rule',
     mode: {
       ppi: 'PPI',
@@ -47,7 +47,8 @@ export default {
     maxPpi: 'Maximum PPI',
     minPpd: 'Minimum px/°',
     maxPpd: 'Maximum px/°',
-    ppdHint: 'Pixels per degree uses the viewing distance of the baseline display.',
+    ppdHint:
+      'Browse uses the baseline display’s viewing distance; Compare uses each display’s own distance.',
     minWidth: 'Minimum logical width',
     rangeError: 'The minimum must not be higher than the maximum.',
   },
