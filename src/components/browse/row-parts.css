@@ -1,0 +1,73 @@
+/*
+ * Controls shared by the Browse table and cards: the familiar star, the compare
+ * checkbox, the comfortable-scale chip. Comfortable highlight uses the positive
+ * subtle tokens; the best scale adds a check mark (not colour alone).
+ */
+
+.row-parts__star {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-inline-size: 28px;
+  min-block-size: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-muted);
+}
+
+.row-parts__star--on {
+  color: var(--color-familiar);
+}
+
+.row-parts__check {
+  inline-size: 18px;
+  block-size: 18px;
+  margin: 0;
+  accent-color: var(--color-accent);
+  cursor: pointer;
+}
+
+.row-parts__scale {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding-block: 2px;
+  padding-inline: var(--space-2);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-comfortable-bg);
+  color: var(--color-comfortable-text);
+  font-size: var(--font-size-xs);
+  font-variant-numeric: var(--font-numeric);
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.row-parts__scale--best {
+  box-shadow: inset 0 0 0 1px var(--color-comfortable-text);
+  font-weight: var(--font-weight-semibold);
+}
+
+.row-parts__scale-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.row-parts__muted {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+/* Touch targets: 44 px on coarse pointers (DESIGN: Targets). */
+@media (pointer: coarse) {
+  .row-parts__star {
+    min-inline-size: 44px;
+    min-block-size: 44px;
+  }
+
+  .row-parts__check {
+    inline-size: 24px;
+    block-size: 24px;
+  }
+}

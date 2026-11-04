@@ -1,0 +1,55 @@
+/*
+ * Browse layout: a top block (filters, familiar strip), the count line, the list
+ * and the compare bar. The top block sticks on wide screens only (sm and up), so
+ * on phones the list keeps the room. The compare bar sticks to the bottom of the
+ * view, as the last child.
+ */
+
+.browse {
+  display: grid;
+  gap: var(--space-4);
+  min-inline-size: 0;
+  padding-block-end: var(--space-4);
+}
+
+.browse__top {
+  display: grid;
+  gap: var(--space-3);
+  padding-block: var(--space-3);
+  background-color: var(--color-bg);
+}
+
+@media (min-width: 600px) {
+  .browse__top {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: var(--z-sticky);
+    border-block-end: 1px solid var(--color-border);
+  }
+}
+
+.browse__count {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.browse__empty {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-3);
+  padding: var(--space-6) var(--space-4);
+  border: 1px dashed var(--color-control);
+  border-radius: var(--radius-lg);
+  color: var(--color-text-muted);
+}
+
+.browse__compare-bar {
+  position: sticky;
+  inset-block-end: 0;
+  z-index: var(--z-sticky);
+  display: flex;
+  justify-content: flex-end;
+  padding-block: var(--space-3);
+  background-color: var(--color-bg);
+}

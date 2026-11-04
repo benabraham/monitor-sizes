@@ -1,0 +1,105 @@
+/*
+ * Filter bar: search, comfort toggle and clear on the first row, then chip groups
+ * and the diagonal range. Everything wraps, so it works at 360 px.
+ */
+
+.filter-bar {
+  display: grid;
+  gap: var(--space-3);
+  min-inline-size: 0;
+}
+
+.filter-bar__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+}
+
+.filter-bar__search {
+  flex: 1 1 14rem;
+  min-inline-size: 0;
+}
+
+.filter-bar__input {
+  inline-size: 100%;
+  min-block-size: 36px;
+  padding-inline: var(--space-3);
+  border: 1px solid var(--color-control);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--font-size-md);
+}
+
+@media (min-width: 600px) {
+  .filter-bar__input {
+    font-size: var(--font-size-base);
+  }
+}
+
+.filter-bar__input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.filter-bar__input:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.filter-bar__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-block-size: 36px;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.filter-bar__toggle input {
+  inline-size: 18px;
+  block-size: 18px;
+  margin: 0;
+  accent-color: var(--color-accent);
+}
+
+.filter-bar__group {
+  display: grid;
+  gap: var(--space-1);
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.filter-bar__legend {
+  padding: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.filter-bar__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.filter-bar__range {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-3);
+}
+
+.filter-bar__range-field {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-1);
+  inline-size: 8.5rem;
+}
+
+.filter-bar__range-field .number-field {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+}
