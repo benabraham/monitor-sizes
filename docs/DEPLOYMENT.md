@@ -163,28 +163,28 @@ use. Output looks like this, with the numbers of the build at the time of writin
 First load (counted)
 File                                      Gzip
 ----------------------------------------------
-index-D0EpYqZK.js                     25.53 kB
+index-DMawsNUb.js                     25.71 kB
 rolldown-runtime-DK3Fl9T5.js           0.15 kB
 button-ChYhX0pc.js                     6.88 kB
 format-CSVUwSdG.js                     0.89 kB
 registerSW.js                          0.13 kB
 cs-CWqgBfNX.js  (largest locale)       6.10 kB
 ----------------------------------------------
-Total                                 39.69 kB
+Total                                 39.86 kB
 
 Lazy, loaded on demand (not counted)
 ----------------------------------------------
-add-display-dialog-Y1M86xQP.js         0.28 kB
-add-display-form-L0VoIQB8.js           3.36 kB
-compare-data-DEbxoIPb.js               2.71 kB
-compare-view-BZpnEQqR.js               4.96 kB
-data-transfer-Ddrl4-DM.js              0.95 kB
-display-actions-DzFQCJVe.js            0.93 kB
+add-display-dialog-uHFVt-HV.js         0.27 kB
+add-display-form-DHGLuYfN.js           3.36 kB
+compare-data-DVH9aNfd.js               2.71 kB
+compare-view-CCMIUvoz.js               4.96 kB
+data-transfer-CrHDcq7j.js              0.94 kB
+display-actions-bH_CK_CN.js            0.93 kB
 en-D5LiQkIm.js                         5.40 kB
-onboarding-dMBmPe-p.js                 2.38 kB
-settings-panel-BWicen1V.js             2.07 kB
+onboarding-Boojzujh.js                 2.38 kB
+settings-panel-2THsqxZt.js             2.07 kB
 
-OK: 39.69 kB of 50.00 kB budget
+OK: 39.86 kB of 50.00 kB budget
 ```
 
 Service-worker and Workbox files (`sw.js`, `workbox-*.js`) are excluded, because Workbox
