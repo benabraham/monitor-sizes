@@ -7,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import {
   checkBudget,
   getGzipSizes,
+  parseDistDir,
   parseInitialUrls,
   parseStaticImports,
   runBundleCheck,
@@ -383,5 +384,35 @@ describe('runBundleCheck', () => {
 
     expect(exitCode).toBe(1)
     expect(output).toContain('Run "pnpm build" first')
+  })
+})
+
+describe('parseDistDir', () => {
+  it('measures the default folder when no --dir is given', () => {
+    expect(parseDistDir({ argv: [], defaultDir: '/app/dist' })).toBe('/app/dist')
+  })
+
+  it('measures the folder given after --dir, as an absolute path', () => {
+    const dir = parseDistDir({ argv: ['--dir', 'scratch/dist-b'], defaultDir: '/app/dist' })
+
+    expect(dir).toBe(join(process.cwd(), 'scratch/dist-b'))
+  })
+
+  it('accepts --dir=<folder>', () => {
+    const dir = parseDistDir({ argv: ['--dir=/tmp/out'], defaultDir: '/app/dist' })
+
+    expect(dir).toBe('/tmp/out')
+  })
+
+  it('throws when --dir has no folder after it', () => {
+    expect(() => parseDistDir({ argv: ['--dir'], defaultDir: '/app/dist' })).toThrow(
+      '--dir needs a folder',
+    )
+  })
+
+  it('throws when --dir is followed by another flag', () => {
+    expect(() =>
+      parseDistDir({ argv: ['--dir', '--verbose'], defaultDir: '/app/dist' }),
+    ).toThrow('--dir needs a folder')
   })
 })

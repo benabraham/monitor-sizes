@@ -16,6 +16,9 @@
  *
  * Usage: `pnpm build && pnpm size`. Sizes use gzip at zlib's default level, and 1 kB here
  * is 1024 bytes, so the budget is 51200 bytes.
+ *
+ * `--dir <folder>` measures a build made into another folder, for example a scratch build
+ * (`pnpm size -- --dir /tmp/build`). Without it, `dist/` is measured.
  */
 import { existsSync } from 'node:fs'
 import { readdir, readFile } from 'node:fs/promises'
@@ -295,6 +298,28 @@ export const runBundleCheck = async ({ distDir, localeNames, budgetBytes }) => {
 }
 
 /**
+ * Reads the optional `--dir <folder>` (or `--dir=<folder>`) argument. A folder given
+ * after `--dir` is resolved against the working directory.
+ *
+ * @param {{ argv: string[], defaultDir: string }} options `argv` is `process.argv.slice(2)`.
+ * @returns {string} the folder to measure: the `--dir` value, or `defaultDir`
+ * @throws {Error} when `--dir` has no folder after it
+ * @example
+ * parseDistDir({ argv: ['--dir', 'out'], defaultDir: 'dist' }) // '/…/out'
+ */
+export const parseDistDir = ({ argv, defaultDir }) => {
+  const inline = argv.find((arg) => arg.startsWith('--dir='))
+  if (inline) return resolve(inline.slice('--dir='.length))
+  const index = argv.indexOf('--dir')
+  if (index === -1) return defaultDir
+  const value = argv[index + 1]
+  if (!value || value.startsWith('--')) {
+    throw new Error('--dir needs a folder, for example --dir dist')
+  }
+  return resolve(value)
+}
+
+/**
  * Lists the language codes, from the folder names in `src/i18n/locales`.
  * @param {{ dir: string }} options
  * @returns {Promise<string[]>} sorted codes, for example `['cs', 'en']`
@@ -310,15 +335,24 @@ export const readLocaleNames = async ({ dir }) => {
 const isMain = process.argv[1] === fileURLToPath(import.meta.url)
 
 if (isMain) {
-  const { exitCode, output } = await runBundleCheck({
-    distDir: DIST_DIR,
-    localeNames: await readLocaleNames({ dir: LOCALES_DIR }),
-    budgetBytes: BUDGET_BYTES,
-  })
-  if (exitCode === 0) {
-    console.log(output)
-  } else {
-    console.error(output)
+  try {
+    const distDir = parseDistDir({
+      argv: process.argv.slice(2),
+      defaultDir: DIST_DIR,
+    })
+    const { exitCode, output } = await runBundleCheck({
+      distDir,
+      localeNames: await readLocaleNames({ dir: LOCALES_DIR }),
+      budgetBytes: BUDGET_BYTES,
+    })
+    if (exitCode === 0) {
+      console.log(output)
+    } else {
+      console.error(output)
+    }
+    process.exitCode = exitCode
+  } catch (error) {
+    console.error(error.message)
+    process.exitCode = 1
   }
-  process.exitCode = exitCode
 }

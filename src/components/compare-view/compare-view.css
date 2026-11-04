@@ -26,6 +26,34 @@
     align-items: start;
     column-gap: var(--space-6);
   }
+
+  /*
+   * The visual column is the sticky panel. It sticks inside the grid row, which is as tall
+   * as the metrics column, so it stays on screen for the whole scroll. Taller than the
+   * viewport, it scrolls inside itself (PRD F11).
+   */
+  .compare-view__visual {
+    position: sticky;
+    top: var(--compare-visual-sticky-top, 0px);
+    max-block-size: calc(100dvh - var(--compare-visual-sticky-top, 0px) - var(--space-4));
+    overflow-y: auto;
+  }
+}
+
+/*
+ * Phones: the drawing is pinned for the whole view, with the controls and the metrics
+ * scrolling beneath it. Its sticky block must be the view itself, so the wrappers are
+ * flattened here (display: contents) and the view stacks them in a column.
+ */
+@media (max-width: 899px) {
+  .compare-view {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .compare-view__visual {
+    display: contents;
+  }
 }
 
 .compare-manager {
