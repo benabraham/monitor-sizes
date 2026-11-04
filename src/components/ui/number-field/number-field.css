@@ -1,0 +1,66 @@
+/*
+ * NumberField: a label above one bordered box holding the text input and an
+ * optional unit. The focus ring is drawn on the box (`:has()`), not the bare input.
+ */
+
+.number-field {
+  display: grid;
+  gap: var(--space-1);
+  min-inline-size: 0;
+}
+
+.number-field__label {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.number-field__control {
+  display: flex;
+  align-items: center;
+  min-block-size: 36px;
+  border: 1px solid var(--color-control);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+}
+
+.number-field__control:has(.number-field__input:focus-visible) {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.number-field__input {
+  flex: 1 1 auto;
+  inline-size: 100%;
+  min-inline-size: 0;
+  min-block-size: 34px;
+  margin: 0;
+  padding-inline: var(--space-3);
+  border: 0;
+  border-radius: var(--radius-md);
+  background-color: transparent;
+  color: inherit;
+  font-size: var(--font-size-base);
+  font-variant-numeric: var(--font-numeric);
+}
+
+.number-field__input:focus,
+.number-field__input:focus-visible {
+  outline: none;
+}
+
+.number-field__unit {
+  flex-shrink: 0;
+  padding-inline-end: var(--space-3);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+}
+
+/* Phones: 16 px text stops iOS from zooming the page when the field is focused. */
+@media (max-width: 599.98px) {
+  .number-field__input {
+    font-size: var(--font-size-md);
+  }
+}

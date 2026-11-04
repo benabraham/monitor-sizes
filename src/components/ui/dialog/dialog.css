@@ -1,0 +1,105 @@
+/*
+ * Dialog on the native <dialog> element. The panel is a flex column so the body
+ * scrolls while the header and footer stay put. Below 600 px the dialog becomes a
+ * full-screen sheet.
+ */
+
+.dialog {
+  inline-size: min(36rem, calc(100vw - 2 * var(--space-4)));
+  max-inline-size: calc(100vw - 2 * var(--space-4));
+  max-block-size: min(85dvh, 48rem);
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+.dialog[open] {
+  animation: dialog-in var(--duration-base) ease-out;
+}
+
+.dialog::backdrop {
+  background-color: var(--color-backdrop);
+}
+
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.dialog__panel {
+  display: flex;
+  flex-direction: column;
+  max-block-size: inherit;
+}
+
+.dialog__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-4) var(--space-3);
+  border-block-end: 1px solid var(--color-border);
+}
+
+.dialog__title {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+}
+
+.dialog__body {
+  flex: 1 1 auto;
+  min-block-size: 0;
+  padding: var(--space-4);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.dialog__body > * + * {
+  margin-block-start: var(--space-3);
+}
+
+.dialog__footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-block-start: 1px solid var(--color-border);
+}
+
+/* Phones: full-screen sheet, respecting the notch and home indicator. */
+@media (max-width: 599.98px) {
+  .dialog {
+    inline-size: 100vw;
+    max-inline-size: 100vw;
+    block-size: 100dvh;
+    max-block-size: 100dvh;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .dialog__panel {
+    block-size: 100%;
+    max-block-size: 100%;
+  }
+
+  .dialog__header {
+    padding-block-start: calc(var(--space-3) + env(safe-area-inset-top, 0px));
+  }
+
+  .dialog__footer {
+    padding-block-end: calc(var(--space-3) + env(safe-area-inset-bottom, 0px));
+  }
+}

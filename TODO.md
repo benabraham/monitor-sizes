@@ -28,7 +28,7 @@ items are sub-tasks. Keep this file current — rules in [`CLAUDE.md`](./CLAUDE.
 
 ## Wave 2 — state and UI foundation
 
-- [ ] Design tokens, global CSS, UI primitives, help popover
+- [x] Design tokens, global CSS, UI primitives, help popover
 - [ ] `state/store.js` (signals, computed rows, actions, persistence, URL sync)
   - [ ] Locale precedence: URL → saved preference → `detectLocale()`
   - [ ] Baseline enforcement: exactly one, from the familiar set (F3)

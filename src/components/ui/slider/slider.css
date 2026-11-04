@@ -1,0 +1,107 @@
+/*
+ * Slider. The track fill follows the thumb through the `--slider-progress` custom
+ * property set inline by the component. Track and thumb are styled for WebKit/
+ * Blink and Gecko; the focus ring sits on the thumb.
+ */
+
+.slider {
+  display: grid;
+  gap: var(--space-1);
+  min-inline-size: 0;
+}
+
+.slider__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.slider__label {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.slider__value {
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  font-variant-numeric: var(--font-numeric);
+  white-space: nowrap;
+}
+
+.slider__input {
+  --slider-progress: 50%;
+
+  -webkit-appearance: none;
+  appearance: none;
+  inline-size: 100%;
+  block-size: 24px;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.slider__input:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.slider__input:focus {
+  outline: none;
+}
+
+/* WebKit / Blink */
+.slider__input::-webkit-slider-runnable-track {
+  block-size: 6px;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(
+    to right,
+    var(--color-accent) var(--slider-progress),
+    var(--color-control) var(--slider-progress)
+  );
+}
+
+.slider__input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  inline-size: 20px;
+  block-size: 20px;
+  margin-block-start: -7px;
+  border: 2px solid var(--color-surface);
+  border-radius: 50%;
+  background: var(--color-accent);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Gecko */
+.slider__input::-moz-range-track {
+  block-size: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--color-control);
+}
+
+.slider__input::-moz-range-progress {
+  block-size: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--color-accent);
+}
+
+.slider__input::-moz-range-thumb {
+  inline-size: 20px;
+  block-size: 20px;
+  border: 2px solid var(--color-surface);
+  border-radius: 50%;
+  background: var(--color-accent);
+  box-shadow: var(--shadow-sm);
+}
+
+.slider__input:focus-visible::-webkit-slider-thumb {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.slider__input:focus-visible::-moz-range-thumb {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
