@@ -20,9 +20,9 @@ items are sub-tasks. Keep this file current — rules in [`CLAUDE.md`](./CLAUDE.
 - [x] Seed data + one-off import script (`src/data/seed.json`, names normalised)
 - [x] `lib/units.js`, `lib/format.js` — F16
 - [x] i18n infrastructure + `common` and `metrics` namespaces (en, cs) — F16, F20
-- [ ] `lib/scales.js` (OS presets, detection, custom scale parsing) — F21
-- [ ] `lib/url-state.js` (full view state in the URL, custom displays embedded) — F19
-- [ ] `lib/storage.js` (IndexedDB, never throws) — F2, F17
+- [x] `lib/scales.js` (OS presets, detection, custom scale parsing) — F21
+- [x] `lib/url-state.js` (full view state in the URL, custom displays embedded) — F19
+- [x] `lib/storage.js` (IndexedDB, never throws) — F2, F17
 - [x] PWA icons, manifest, bundle-size guard
 - [x] CI workflow + GitHub Pages deploy workflow
 
