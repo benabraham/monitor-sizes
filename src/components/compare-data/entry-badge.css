@@ -1,0 +1,30 @@
+/* Role badge for a compared display (baseline, familiar, candidate). */
+.entry-badge {
+  display: inline-flex;
+  align-items: center;
+  padding-inline: var(--space-2);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+
+.entry-badge--baseline {
+  background-color: var(--color-baseline);
+  color: var(--color-accent-contrast);
+}
+
+.entry-badge--familiar {
+  background-color: var(--color-surface-2);
+  color: var(--color-familiar);
+  border-style: dashed;
+  border-color: var(--color-familiar);
+}
+
+.entry-badge--candidate {
+  background-color: var(--color-surface-2);
+  color: var(--color-text);
+  border-color: var(--color-control);
+}
