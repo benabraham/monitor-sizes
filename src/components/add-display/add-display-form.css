@@ -1,0 +1,188 @@
+/*
+ * AddDisplayForm. One column on phones; sizes sit side by side from 600 px. Hints and
+ * errors use text, not colour alone: errors start with a label and carry aria-describedby.
+ */
+
+.add-display-form {
+  display: grid;
+  gap: var(--space-4);
+  min-inline-size: 0;
+  container-type: inline-size;
+}
+
+.add-display-form__field {
+  display: grid;
+  gap: var(--space-1);
+  min-inline-size: 0;
+}
+
+.add-display-form__label {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+/* Name input, styled to match NumberField's boxed control. */
+.add-display-form__input,
+.add-display-form__select {
+  inline-size: 100%;
+  min-block-size: 36px;
+  padding-inline: var(--space-3);
+  border: 1px solid var(--color-control);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--font-size-base);
+}
+
+.add-display-form__input:focus-visible,
+.add-display-form__select:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.add-display-form__input[aria-invalid='true'] {
+  border-color: var(--color-negative);
+  border-width: 2px;
+}
+
+.add-display-form__sizes {
+  display: grid;
+  gap: var(--space-3);
+}
+
+@container (min-width: 36rem) {
+  .add-display-form__sizes {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.add-display-form__error {
+  margin: 0;
+  color: var(--color-negative);
+  font-size: var(--font-size-sm);
+}
+
+.add-display-form__error::before {
+  content: '! ';
+  font-weight: var(--font-weight-semibold);
+}
+
+.add-display-form__hint {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.add-display-form__note {
+  margin: 0;
+  color: var(--color-accent-subtle-text);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.add-display-form__like-screen {
+  display: grid;
+  gap: var(--space-1);
+  justify-items: start;
+}
+
+.add-display-form__presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.add-display-form__subtitle {
+  margin: 0 0 var(--space-2);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.add-display-form__preview {
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface-2);
+}
+
+.add-display-form__stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2) var(--space-3);
+  margin: 0;
+}
+
+.add-display-form__stats > div {
+  display: grid;
+  gap: 0;
+  min-inline-size: 0;
+}
+
+.add-display-form__stats dt {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.add-display-form__stats dd {
+  margin: 0;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  overflow-wrap: anywhere;
+}
+
+.add-display-form__check {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-block-size: 36px;
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+}
+
+.add-display-form__check input {
+  inline-size: 18px;
+  block-size: 18px;
+  margin: 0;
+  accent-color: var(--color-accent);
+}
+
+.add-display-form__check:has(input:focus-visible) {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+  border-radius: var(--radius-sm);
+}
+
+.add-display-form__familiar,
+.add-display-form__tag {
+  display: grid;
+  gap: var(--space-2);
+  justify-items: start;
+}
+
+.add-display-form__familiar-fields {
+  display: grid;
+  gap: var(--space-3);
+  inline-size: 100%;
+}
+
+@container (min-width: 36rem) {
+  .add-display-form__familiar-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.add-display-form__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+/* Phones: 16 px text stops iOS from zooming the page when a field is focused. */
+@media (max-width: 599.98px) {
+  .add-display-form__input,
+  .add-display-form__select {
+    font-size: var(--font-size-md);
+  }
+}

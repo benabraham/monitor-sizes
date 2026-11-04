@@ -1,0 +1,64 @@
+/*
+ * Onboarding page. Full page on every width: a single column with a 720 px reading
+ * measure from the sm breakpoint, and the action row pinned to the bottom of the
+ * content, not the viewport.
+ */
+
+.onboarding {
+  display: grid;
+  gap: var(--space-5);
+  align-content: start;
+  inline-size: min(100%, 45rem);
+  margin-inline: auto;
+  padding-block: var(--space-6) calc(var(--space-6) + env(safe-area-inset-bottom, 0px));
+  min-block-size: 100dvh;
+}
+
+.onboarding__header {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.onboarding__progress {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.onboarding__title {
+  margin: 0;
+  font-size: var(--font-size-xl);
+}
+
+.onboarding__title:focus {
+  outline: none;
+}
+
+.onboarding__title:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+  border-radius: var(--radius-sm);
+}
+
+.onboarding__actions {
+  position: sticky;
+  inset-block-end: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  padding-block: var(--space-3);
+  padding-block-end: calc(var(--space-3) + env(safe-area-inset-bottom, 0px));
+  background-color: var(--color-bg);
+  border-block-start: 1px solid var(--color-border);
+  z-index: var(--z-sticky);
+}
+
+.onboarding__hint {
+  margin: 0;
+  margin-inline-end: auto;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}

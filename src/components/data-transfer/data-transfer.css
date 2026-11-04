@@ -1,0 +1,66 @@
+/*
+ * DataTransfer panel: export and import buttons side by side (wrapping on phones).
+ * The import control is a label styled like the secondary Button, with its file
+ * input visually hidden but still focusable, so the focus ring can be drawn on the label.
+ */
+
+.data-transfer {
+  display: grid;
+  gap: var(--space-3);
+  min-inline-size: 0;
+}
+
+.data-transfer__title {
+  margin: 0;
+  font-size: var(--font-size-lg);
+}
+
+.data-transfer__description {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.data-transfer__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.data-transfer__import {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-block-size: 36px;
+  padding-inline: var(--space-3);
+  border: 1px solid var(--color-control);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.data-transfer__import:hover {
+  background-color: var(--color-surface-2);
+}
+
+.data-transfer__import:has(.data-transfer__file:focus-visible) {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.data-transfer__status {
+  margin: 0;
+  color: var(--color-positive);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.data-transfer__status--error {
+  color: var(--color-negative);
+}

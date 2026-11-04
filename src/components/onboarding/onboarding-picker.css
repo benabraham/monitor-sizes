@@ -1,0 +1,157 @@
+/*
+ * Onboarding step 1. The list is a grid of checkboxes: one column on phones, two from
+ * the sm breakpoint. Each option is a full-width tap target of at least 36 px.
+ */
+
+.onboarding-picker {
+  display: grid;
+  gap: var(--space-4);
+  min-inline-size: 0;
+}
+
+.onboarding-picker__intro {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.onboarding-picker__toolbar {
+  display: grid;
+  gap: var(--space-3);
+  align-items: end;
+}
+
+@media (min-width: 600px) {
+  .onboarding-picker__toolbar {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+}
+
+.onboarding-picker__search {
+  display: grid;
+  gap: var(--space-1);
+  min-inline-size: 0;
+}
+
+.onboarding-picker__label,
+.onboarding-picker__subtitle {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.onboarding-picker__subtitle {
+  color: var(--color-text);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+}
+
+.onboarding-picker__input {
+  inline-size: 100%;
+  min-block-size: 36px;
+  padding-inline: var(--space-3);
+  border: 1px solid var(--color-control);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--font-size-base);
+}
+
+.onboarding-picker__input:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+@media (max-width: 599.98px) {
+  .onboarding-picker__input {
+    font-size: var(--font-size-md);
+  }
+}
+
+.onboarding-picker__count,
+.onboarding-picker__empty {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.onboarding-picker__groups {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.onboarding-picker__group {
+  display: grid;
+  gap: var(--space-2);
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.onboarding-picker__legend {
+  margin-block-end: var(--space-1);
+  padding: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+}
+
+.onboarding-picker__options {
+  display: grid;
+  gap: var(--space-1);
+}
+
+@media (min-width: 600px) {
+  .onboarding-picker__options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.onboarding-picker__option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-block-size: 36px;
+  padding-inline: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+
+.onboarding-picker__option:has(input:checked) {
+  border-color: var(--color-accent);
+  background-color: var(--color-accent-subtle);
+  color: var(--color-accent-subtle-text);
+}
+
+.onboarding-picker__option input {
+  flex-shrink: 0;
+  inline-size: 18px;
+  block-size: 18px;
+  margin: 0;
+  accent-color: var(--color-accent);
+}
+
+.onboarding-picker__option:has(input:focus-visible) {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.onboarding-picker__add-own {
+  display: grid;
+  gap: var(--space-3);
+  justify-items: start;
+}
+
+.onboarding-picker__add-own-panel {
+  display: grid;
+  gap: var(--space-3);
+  inline-size: 100%;
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface-2);
+}
