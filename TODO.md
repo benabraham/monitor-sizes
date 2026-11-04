@@ -32,27 +32,37 @@ items are sub-tasks. Keep this file current — rules in [`CLAUDE.md`](./CLAUDE.
 - [x] `state/store.js` (signals, computed rows, actions, persistence, URL sync)
   - [x] Locale precedence: URL → saved preference → `detectLocale()`
   - [x] Baseline enforcement: exactly one, from the familiar set (F3)
-- [ ] App shell wiring store ⇄ components
+- [x] App shell wiring store ⇄ components
   - [x] Header, settings panel, copy link, shared-view banner (presentational)
 
 ## Wave 3 — feature views
 
-- [ ] Onboarding: pick ≥ 1 familiar display, distance + scale each, units (F2)
-- [ ] Browse: familiar strip, search/filters, sortable table / phone cards (F4, F5, F8, F9)
-- [ ] Compare: always-visible visualization, Physical ⇄ As seen (F10–F13)
+- [x] Onboarding: pick ≥ 1 familiar display, distance + scale each, units (F2)
+- [x] Browse: familiar strip, search/filters, sortable table / phone cards (F4, F5, F8, F9)
+- [x] Compare: always-visible visualization, Physical ⇄ As seen (F10–F13)
   - [x] Distance + scale controls, match buttons, equivalence line (F15)
-- [ ] Compare: metric grid incl. angular metrics, full scaling matrix (F6, F14)
-- [ ] Add/edit/delete custom display, live preview, presets (F17)
-- [ ] Import/export JSON (F18)
-- [ ] "Like my screen" helper (F22)
+- [x] Compare: metric grid incl. angular metrics, full scaling matrix (F6, F14)
+- [x] Add/edit/delete custom display, live preview, presets (F17)
+- [x] Import/export JSON (F18)
+- [x] "Like my screen" helper (F22)
 
 ## Wave 4 — integration and release
 
 - [ ] E2E: onboarding, compare flow, share-link round trip, offline reload, install check
 - [ ] Accessibility pass (keyboard, labels, contrast, text equivalent of the overlay)
 - [ ] Performance check: 200 displays recalculated < 16 ms; JS < 50 kB gzipped
+  - [x] Store perf test: 200 displays ≈ 2 ms
+  - [ ] Bundle back under 50 kB (lazy per-locale catalogues; was 53.5 kB)
 - [ ] README with screenshots and user guide
+  - [x] README, USER-GUIDE (en, cs), CALCULATIONS
+  - [ ] Screenshots in `docs/screenshots/`
+- [ ] Layout polish from browser review
+  - [ ] Familiar chips: separate name and diagonal
+  - [ ] Compare desktop: only the visualization sticky, controls reachable
+  - [ ] Compare phone: cap the pinned visualization height
+  - [ ] Move the `.visually-hidden` clip fix into `global.css`
+- [ ] Optional: long-press on a display to add it to compare (PRD key interaction; checkbox already covers it)
 - [ ] Deploy to GitHub Pages
-  - [ ] Repo owner: make the repo public (or a plan with private Pages)
+  - [x] Repo owner: make the repo public (or a plan with private Pages)
   - [ ] Repo owner: Settings → Pages → Source "GitHub Actions"
   - [ ] Verify the live app installs and works offline
