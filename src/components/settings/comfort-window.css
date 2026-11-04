@@ -1,0 +1,26 @@
+/* Comfort window: rule toggle, the number fields in a responsive grid, hint and error. */
+
+.comfort-window {
+  display: grid;
+  gap: var(--space-3);
+  min-inline-size: 0;
+}
+
+.comfort-window__fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: var(--space-3);
+}
+
+.comfort-window__hint {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.comfort-window__error {
+  margin: 0;
+  color: var(--color-negative);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}

@@ -1,0 +1,13 @@
+/* Settings panel: the groups stacked in one column, with a comfortable reading width. */
+
+.settings-panel {
+  display: grid;
+  gap: var(--space-4);
+  min-inline-size: 0;
+}
+
+.settings-panel__hint {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
