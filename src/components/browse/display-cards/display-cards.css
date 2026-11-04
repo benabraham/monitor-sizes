@@ -132,4 +132,14 @@
   .display-cards__compare {
     min-block-size: 44px;
   }
+
+  /*
+   * A long press on a card toggles Compare (use-long-press.js). On touch screens a long press
+   * on text would select it instead, so the card is not selectable there.
+   */
+  .display-cards__card {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
 }

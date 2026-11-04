@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor, within } from '@testing-library/preact'
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/preact'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { App } from './app.jsx'
@@ -493,5 +493,46 @@ describe('Shell', () => {
     const link = new URL(writeText.mock.calls[0][0])
     expect(decodeState(link.hash).units).toBe('imperial')
     expect(decodeState(link.hash).familiar.map(({ id }) => id)).toEqual([FHD.id])
+  })
+})
+
+describe('Compare from Browse', () => {
+  it('hides a familiar display from Compare with its row checkbox, and shows it again', async () => {
+    const user = userEvent.setup()
+    const { store } = renderApp({ stored: TWO_FAMILIAR })
+    await waitForView('Browse')
+
+    const checkbox = screen.getByRole('checkbox', { name: 'Compare 4K' })
+    expect(checkbox.checked).toBe(true)
+    await user.click(checkbox)
+    expect(store.hiddenFamiliarIds.value).toEqual([UHD.id])
+
+    await user.click(screen.getByRole('checkbox', { name: 'Compare 4K' }))
+    expect(store.hiddenFamiliarIds.value).toEqual([])
+  })
+
+  it('adds a display to Compare with a long press on its row', async () => {
+    const { store } = renderApp({ stored: ONBOARDED })
+    await waitForView('Browse')
+    const row = screen.getByRole('button', { name: 'UW 34' }).closest('tr')
+
+    vi.useFakeTimers()
+    try {
+      fireEvent.pointerDown(row, {
+        pointerType: 'touch',
+        isPrimary: true,
+        button: 0,
+        clientX: 4,
+        clientY: 4,
+      })
+      act(() => {
+        vi.advanceTimersByTime(500)
+      })
+      fireEvent.pointerUp(row, { pointerType: 'touch', isPrimary: true, button: 0 })
+    } finally {
+      vi.useRealTimers()
+    }
+
+    expect(store.compareIds.value).toEqual([UW.id])
   })
 })

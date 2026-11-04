@@ -67,25 +67,28 @@ test.describe('compare', () => {
     await expect(mode.getByRole('radio', { name: 'Physical' })).toBeChecked()
     await expect(page.getByRole('img', { name: /^Physical size/ })).toBeVisible()
 
-    await mode.getByRole('radio', { name: 'As seen' }).check()
+    // The radio is visually hidden inside its label, so the label is what a person clicks.
+    await mode.locator('label', { hasText: 'As seen' }).click()
 
     await expect(page.getByRole('img', { name: /^Apparent size of the compared displays/ })).toBeVisible()
     await expect(page.getByText(/^As seen: each outline shows its angle/)).toBeVisible()
 
-    await mode.getByRole('radio', { name: 'Physical' }).check()
+    await mode.locator('label', { hasText: 'Physical' }).click()
     await expect(page.getByRole('img', { name: /^Physical size/ })).toBeVisible()
   })
 
-  test('changing a candidate distance rewrites the equivalence line', async ({ page }) => {
-    const line = candidate(page, DISPLAYS.uhd32).getByText(/^Looks like your 14\.2″ MacBook Pro 14″/)
-    await expect(line).toBeVisible()
+  test('changing a candidate scale rewrites the equivalence line', async ({ page }) => {
+    // The line says where the candidate matches the baseline. It depends on the baseline
+    // distance and on the candidate's scale, not on the candidate's own distance.
+    const card = candidate(page, DISPLAYS.uhd32)
+    const line = card.getByText(/^Looks like your 14\.2″ MacBook Pro 14″/)
+    await expect(line).toContainText(/\(150\s*%\)$/)
     const before = await line.textContent()
 
-    const card = candidate(page, DISPLAYS.uhd32)
-    await card.getByRole('textbox', { name: 'Exact distance' }).fill('90')
+    await card.getByRole('combobox', { name: 'Scale' }).selectOption('1.25')
 
+    await expect(line).toContainText(/\(125\s*%\)$/)
     await expect(line).not.toHaveText(before)
-    await expect(card.getByRole('slider', { name: 'Distance' })).toHaveValue('90')
   })
 
   test('Match size sets the candidate distance to the size-equivalent distance', async ({ page }) => {
@@ -107,17 +110,21 @@ test.describe('compare', () => {
     await expect(headers.nth(1)).toContainText('MacBook Pro 14″')
     await expect(headers.nth(1)).toContainText('Baseline')
     await expect(headers.nth(2)).toContainText('4K UHD')
-    await expect(headers.nth(3)).toContainText('UWQHD')
+    await expect(headers.nth(3)).toContainText('4K UHD')
+    await expect(headers.nth(3)).toContainText('Candidate')
+    await expect(headers.nth(4)).toContainText('UWQHD')
   })
 
-  test('the scaling matrix highlights the comfortable scales of a candidate', async ({ page }) => {
-    const matrix = page.getByRole('table', { name: /^Scaling options for 4K UHD/ }).filter({
-      hasText: '3840 × 2160',
-    })
-    const matrix32 = page.getByRole('table', { name: /Scaling options for .*32″/ })
-    await expect(matrix32).toBeVisible()
-    await expect(matrix32.getByRole('cell', { name: 'Comfortable', exact: true }).first()).toBeVisible()
-    await expect(matrix32.getByRole('cell', { name: 'Outside the comfort window' }).first()).toBeVisible()
-    void matrix
+  test('the scaling matrix marks the comfortable scales of a candidate', async ({ page }) => {
+    // Two matrices are captioned "4K UHD", in Compare order: the familiar 27″, then the 32″.
+    const matrix = page.getByRole('table', { name: /^Scaling options for 4K UHD/ }).nth(1)
+    await expect(matrix).toBeVisible()
+    // 32″ 4K at 150 % has 92 effective PPI, inside the 90–105 window.
+    const row150 = matrix.getByRole('row').filter({ has: page.getByRole('rowheader', { name: '150 %' }) })
+    await expect(row150.getByRole('cell', { name: /^Comfortable/ })).toBeVisible()
+    await expect(row150).toContainText('92')
+    // 100 % has 138 effective PPI, outside the window.
+    const row100 = matrix.getByRole('row').filter({ has: page.getByRole('rowheader', { name: '100 %' }) })
+    await expect(row100.getByRole('cell', { name: 'Outside the comfort window' })).toBeVisible()
   })
 })

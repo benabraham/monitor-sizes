@@ -21,9 +21,14 @@
 /*
  * Phones: the pinned drawing must leave most of the screen to the controls. The drawing scales
  * down with its viewBox and stays centred, and the text sizes are not pinned (they are outside
- * this block).
+ * this block). The block is flattened into the compare view, so the drawing sticks for the
+ * whole view (see compare-view.css).
  */
 @media (max-width: 899px) {
+  .compare-visual {
+    display: contents;
+  }
+
   .compare-visual__pinned {
     max-block-size: 38dvh;
   }
@@ -42,6 +47,7 @@
  */
 @media (min-width: 900px) {
   .compare-visual__pinned {
+    top: 0;
     max-block-size: calc(100dvh - var(--compare-visual-sticky-top, 0px) - var(--space-4));
     overflow-y: auto;
   }

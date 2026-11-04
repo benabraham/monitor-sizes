@@ -118,4 +118,11 @@
   .display-table__name-button {
     min-block-size: 44px;
   }
+
+  /* A long press on a row toggles Compare, so the row is not selectable on touch screens. */
+  .display-table__row {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
 }
