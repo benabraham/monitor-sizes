@@ -32,7 +32,7 @@ describe('ComfortWindow', () => {
     expect(screen.queryByLabelText('Minimum px/°')).toBeNull()
     expect(
       screen.queryByText(
-        'Pixels per degree uses the viewing distance of the baseline display.',
+        'Browse uses the baseline display’s viewing distance; Compare uses each display’s own distance.',
       ),
     ).toBeNull()
   })
@@ -50,7 +50,7 @@ describe('ComfortWindow', () => {
     expect(screen.queryByLabelText('Minimum PPI')).toBeNull()
     expect(
       screen.getByText(
-        'Pixels per degree uses the viewing distance of the baseline display.',
+        'Browse uses the baseline display’s viewing distance; Compare uses each display’s own distance.',
       ),
     ).not.toBeNull()
   })
