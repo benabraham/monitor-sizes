@@ -71,8 +71,10 @@ describe('HelpPopover', () => {
     expect(panel.getAttribute('popover')).toBe('auto')
     expect(panel.getAttribute('role')).toBe('dialog')
     expect(panel.getAttribute('aria-labelledby')).toBe('help-ppi-title')
-    // The panel is closed here, so it is hidden from the accessibility tree; opt in to inspect it.
-    expect(screen.getByRole('heading', { name: 'PPI', hidden: true })).not.toBeNull()
+    // The title is a paragraph, so the panel is named by text and not by a heading.
+    expect(container.querySelector('#help-ppi-title').tagName).toBe('P')
+    expect(container.querySelector('#help-ppi-title').textContent).toBe('PPI')
+    expect(screen.queryByRole('heading', { hidden: true })).toBeNull()
     expect(
       screen.getByText(
         'Pixels per inch: diagonal pixels divided by the diagonal in inches.',

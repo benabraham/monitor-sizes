@@ -1,0 +1,160 @@
+/*
+ * Compare view layout and the membership manager. Two columns from 900 px: the
+ * visualization on the left stays in view while the data scrolls on the right.
+ */
+
+.compare-view {
+  display: grid;
+  gap: var(--space-6);
+  min-inline-size: 0;
+}
+
+.compare-view__visual,
+.compare-view__data {
+  min-inline-size: 0;
+}
+
+.compare-view__data {
+  display: grid;
+  gap: var(--space-6);
+  align-content: start;
+}
+
+@media (min-width: 900px) {
+  .compare-view {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+    align-items: start;
+    column-gap: var(--space-6);
+  }
+
+  .compare-view__visual {
+    position: sticky;
+    top: var(--compare-visual-sticky-top, 0px);
+    z-index: var(--z-sticky);
+    max-block-size: calc(100dvh - var(--compare-visual-sticky-top, 0px) - var(--space-4));
+    overflow-y: auto;
+    padding-block: var(--space-1);
+    background-color: var(--color-bg);
+  }
+
+  /* The column itself is the sticky part on wide screens, so the inner block must not
+     stick a second time. */
+  .compare-view .compare-visual__pinned {
+    position: static;
+    padding-block: 0;
+  }
+}
+
+.compare-manager {
+  display: grid;
+  gap: var(--space-3);
+  min-inline-size: 0;
+}
+
+.compare-manager__heading {
+  font-size: var(--font-size-lg);
+}
+
+.compare-manager__empty {
+  display: grid;
+  gap: var(--space-2);
+  justify-items: start;
+}
+
+.compare-manager__hint {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.compare-manager__list {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.compare-manager__item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+}
+
+.compare-manager__item--hidden {
+  border-style: dashed;
+  color: var(--color-text-muted);
+}
+
+.compare-manager__name {
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+
+.compare-manager__badge {
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-surface-2);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+.compare-manager__badge--baseline {
+  background-color: var(--color-accent-subtle);
+  color: var(--color-accent-subtle-text);
+  font-weight: var(--font-weight-semibold);
+}
+
+.compare-manager__badge--familiar {
+  color: var(--color-familiar);
+}
+
+.compare-manager__add {
+  display: grid;
+  gap: var(--space-2);
+  margin-block-start: var(--space-2);
+}
+
+.compare-manager__label {
+  font-weight: var(--font-weight-semibold);
+}
+
+.compare-manager__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.compare-manager__input {
+  flex: 1 1 14rem;
+  min-inline-size: 0;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-control);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--font-size-md);
+}
+
+@media (min-width: 600px) {
+  .compare-manager__input {
+    font-size: var(--font-size-base);
+  }
+}
+
+.compare-manager__input[aria-invalid='true'] {
+  border-color: var(--color-negative);
+}
+
+.compare-manager__error {
+  margin: 0;
+  color: var(--color-negative);
+  font-size: var(--font-size-sm);
+}

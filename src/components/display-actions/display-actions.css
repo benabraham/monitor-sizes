@@ -1,0 +1,64 @@
+/*
+ * DisplayActions: the dialog body for one display. The facts sit at the top, then one
+ * group per kind of action. Buttons stack on phones and wrap on desktop.
+ */
+
+.display-actions {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.display-actions__facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+}
+
+.display-actions__facts > div {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface-2);
+}
+
+.display-actions__facts dt {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.display-actions__facts dd {
+  margin: 0;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+}
+
+.display-actions__group {
+  display: grid;
+  gap: var(--space-2);
+  justify-items: start;
+  padding-block-start: var(--space-3);
+  border-block-start: 1px solid var(--color-border);
+}
+
+.display-actions__note {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.display-actions__confirm {
+  display: grid;
+  gap: var(--space-2);
+  inline-size: 100%;
+  padding: var(--space-3);
+  border: 1px solid var(--color-negative);
+  border-radius: var(--radius-md);
+}
+
+.display-actions__confirm-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
