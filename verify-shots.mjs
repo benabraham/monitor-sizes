@@ -116,9 +116,9 @@ try {
         // Set as baseline on the 32″ candidate: it becomes Baseline, and the numbers follow.
         await page.evaluate(() => window.scrollTo(0, 0))
         const rowBefore = page.getByRole('region', { name: 'Displays in this comparison' })
-        const btn = rowBefore.getByRole('button', { name: 'Set 32″ 4K UHD as baseline' })
+        const btn = rowBefore.getByRole('button', { name: 'Set as baseline for 32″ 4K UHD' })
         await btn.click()
-        await expect(rowBefore.getByRole('button', { name: 'Set 32″ 4K UHD as baseline' })).toHaveCount(0)
+        await expect(rowBefore.getByRole('button', { name: 'Set as baseline for 32″ 4K UHD' })).toHaveCount(0)
         await expect(rowBefore.getByText('Baseline', { exact: true })).toHaveCount(1)
         const afterBase = await measure(page)
         report('1280-light-after-set-baseline', afterBase)
