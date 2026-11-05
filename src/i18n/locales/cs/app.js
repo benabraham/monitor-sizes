@@ -35,6 +35,8 @@ export default {
     showName: 'Zobrazit {name} v porovnání',
     remove: 'Odebrat',
     removeName: 'Odebrat {name} z porovnání',
+    setBaseline: 'Nastavit jako referenční',
+    setBaselineName: 'Nastavit {name} jako referenční',
   },
   hidden: {
     title: 'Skryté vestavěné displeje',

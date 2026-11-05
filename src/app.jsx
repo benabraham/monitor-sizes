@@ -425,6 +425,8 @@ const AppShell = ({ store, shouldFocusHeading = false }) => {
         onAdd={openAdd}
         onOpenSettings={openSettings}
         linkUrl={linkUrl}
+        presetId={store.presetId.value}
+        onPresetChange={(value) => store.setPresetId(value)}
       />
 
       <main id="main" class="app-main" tabIndex={-1}>
@@ -457,6 +459,7 @@ const AppShell = ({ store, shouldFocusHeading = false }) => {
               onApplyEquivalent={({ id, kind }) => store.applyEquivalent({ id, kind })}
               onToggleCompare={(id) => store.toggleCompare(id)}
               onToggleFamiliarHidden={(id) => store.toggleFamiliarHidden(id)}
+              onSetBaseline={(id) => store.promoteToBaseline(id)}
               onGoBrowse={() => changeView('browse')}
             />
           ) : (

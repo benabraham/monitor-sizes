@@ -1,6 +1,6 @@
 import { formatNumber } from '../../lib/format.js'
 import { locale as localeSignal, t } from '../../i18n/index.js'
-import { Button } from '../ui/index.js'
+import { Button, Segmented } from '../ui/index.js'
 import { CopyLink } from '../copy-link/copy-link.jsx'
 import './app-header.css'
 
@@ -18,9 +18,12 @@ import './app-header.css'
  * - The view switch is two buttons inside a labelled `nav`. The active view carries
  *   `aria-current="page"` and a border, so the state is not colour alone.
  * - Compare shows the number of displays being compared, for example "Compare (3)".
- * - Phones (below 600 px): the short name is shown, the nav moves to its own full-width
- *   row, and the action buttons keep their labels for assistive technology only.
- *   Nothing scrolls horizontally at 360 px.
+ * - The OS scale preset (Windows, macOS, Linux) is a segmented switch, always visible, so
+ *   the scaling matrix can be switched from Browse or Compare. It is the same setting as the
+ *   one in Settings. The Linux segment is named "Linux" here; Settings gives the full name.
+ * - Phones (below 600 px): the short name is shown, the nav and the preset switch each take
+ *   a full-width row, and the action buttons keep their labels for assistive technology
+ *   only. Nothing scrolls horizontally at 360 px.
  *
  * @param {object} props
  * @param {ViewId} props.view The active view.
@@ -29,6 +32,9 @@ import './app-header.css'
  * @param {() => void} [props.onAdd] Opens the Add display dialog.
  * @param {() => void} [props.onOpenSettings] Opens the settings panel.
  * @param {string} [props.linkUrl] Link that "Copy link" copies. Defaults to the page address.
+ * @param {'windows'|'macos'|'linux'} [props.presetId='windows'] The OS scale preset shown.
+ * @param {(presetId: 'windows'|'macos'|'linux') => void} [props.onPresetChange] Called with
+ *   the preset the person picked.
  * @returns {import('preact').JSX.Element}
  *
  * @example
@@ -39,6 +45,8 @@ import './app-header.css'
  *   onAdd={openAddDisplay}
  *   onOpenSettings={openSettings}
  *   linkUrl={shareUrl}
+ *   presetId={presetId.value}
+ *   onPresetChange={setPresetId}
  * />
  */
 export const AppHeader = ({
@@ -48,6 +56,8 @@ export const AppHeader = ({
   onAdd,
   onOpenSettings,
   linkUrl,
+  presetId = 'windows',
+  onPresetChange,
 }) => {
   const locale = localeSignal.value
   /** @type {{ id: ViewId, label: string }[]} */
@@ -84,6 +94,20 @@ export const AppHeader = ({
             </Button>
           ))}
         </nav>
+        <div class="app-header__preset">
+          <Segmented
+            name="app-header-preset"
+            label={t('header.preset.label')}
+            isLabelHidden
+            options={[
+              { value: 'windows', label: t('header.preset.windows') },
+              { value: 'macos', label: t('header.preset.macos') },
+              { value: 'linux', label: t('header.preset.linux') },
+            ]}
+            value={presetId}
+            onChange={(value) => onPresetChange?.(value)}
+          />
+        </div>
         <div class="app-header__actions">
           <CopyLink url={linkUrl} />
           <Button

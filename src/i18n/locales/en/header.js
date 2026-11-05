@@ -8,6 +8,12 @@ export default {
     label: 'Views',
     compareCount: 'Compare ({count})',
   },
+  preset: {
+    label: 'Scale preset',
+    windows: 'Windows',
+    macos: 'macOS',
+    linux: 'Linux',
+  },
   copyLink: {
     fieldLabel: 'Link to this comparison',
     fallbackHint:

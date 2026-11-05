@@ -1,67 +1,48 @@
 /*
- * CompareVisual: the pinned visualization above the per-display controls.
- * The pinned block stays on screen while the controls scroll beneath it.
+ * CompareVisual: the preview (the drawing, full width, sticky, at most 60 % of the viewport
+ * height) and the per-display controls. The Compare view's grid places both blocks
+ * (see compare-view.css).
  */
 
-.compare-visual {
-  display: grid;
-  gap: var(--space-4);
-  align-items: start;
-  min-inline-size: 0;
-}
+/*
+ * The preview is sticky under the app header, with the surface background so the content
+ * scrolling beneath it stays out of the way. Its height is capped at 60 % of the viewport
+ * (the mode switch and the drawing together). `--compare-preview-chrome` is the room the mode
+ * switch, the title and the caption take, so the drawing fits in what is left.
+ */
+.compare-visual__preview {
+  --compare-preview-chrome: 7.5rem;
 
-.compare-visual__pinned {
+  grid-area: preview;
   position: sticky;
-  top: var(--compare-visual-sticky-top, 0);
+  top: var(--compare-visual-sticky-top, 0px);
   z-index: var(--z-sticky);
+  min-inline-size: 0;
+  max-block-size: 60dvh;
+  overflow-y: auto;
   padding-block: var(--space-2);
-  background-color: var(--color-bg);
+  border-block-end: 1px solid var(--color-border);
+  background-color: var(--color-surface);
 }
 
 /*
- * Phones: the pinned drawing must leave most of the screen to the controls. The drawing scales
- * down with its viewBox and stays centred, and the text sizes are not pinned (they are outside
- * this block). The block is flattened into the compare view, so the drawing sticks for the
- * whole view (see compare-view.css).
+ * The drawing keeps the frame's aspect ratio (set in visualization.css) and is never taller
+ * than the preview allows. Its width follows from the height it may take, so it is centred
+ * with the frame's ratio intact, and it is only as wide as the view on phones.
  */
-@media (max-width: 899px) {
-  .compare-visual {
-    display: contents;
-  }
-
-  .compare-visual__pinned {
-    max-block-size: 38dvh;
-  }
-
-  .compare-visual__pinned .visualization__svg {
-    inline-size: auto;
-    max-inline-size: 100%;
-    max-block-size: 24dvh;
-    margin-inline: auto;
-  }
-}
-
-/*
- * Desktop: the pinned drawing sticks inside the left column, and never taller than the viewport.
- * It keeps about a third of the viewport height, so the controls scrolling under it have room.
- */
-@media (min-width: 900px) {
-  .compare-visual__pinned {
-    top: 0;
-    max-block-size: calc(100dvh - var(--compare-visual-sticky-top, 0px) - var(--space-4));
-    overflow-y: auto;
-  }
-
-  .compare-visual__pinned .visualization__svg {
-    inline-size: auto;
-    max-inline-size: 100%;
-    max-block-size: 36dvh;
-    margin-inline: auto;
-  }
+.compare-visual__preview .visualization__svg {
+  inline-size: min(
+    100%,
+    calc((60dvh - var(--compare-preview-chrome)) * var(--ratio-w) / var(--ratio-h))
+  );
+  max-block-size: calc(60dvh - var(--compare-preview-chrome));
+  margin-inline: auto;
 }
 
 .compare-visual__controls {
+  grid-area: controls;
   display: grid;
+  align-content: start;
   gap: var(--space-3);
   min-inline-size: 0;
 }

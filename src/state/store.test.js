@@ -461,6 +461,132 @@ describe('applyEquivalent', () => {
   })
 })
 
+describe('promoteToBaseline', () => {
+  /** The compare entry of one display, or undefined. */
+  const entryOf = (store, id) =>
+    store.compareEntries.value.find(({ display }) => display.id === id)
+
+  it('makes a familiar display the baseline, as setBaseline does', () => {
+    const { store } = createEnvironment()
+    store.toggleFamiliar(FHD.id)
+    store.toggleFamiliar(UHD27.id)
+    expect(store.promoteToBaseline(UHD27.id)).toBe(true)
+    expect(store.baselineId.value).toBe(UHD27.id)
+    expect(store.familiar.value.map(({ id }) => id)).toEqual([FHD.id, UHD27.id])
+    expectBaselineInvariant(store)
+  })
+
+  it('turns a candidate into a familiar baseline in one step, keeping its compare settings', () => {
+    const { store } = createEnvironment()
+    store.toggleFamiliar(FHD.id)
+    store.toggleCompare(QHD27.id)
+    store.setCompareSettings({ id: QHD27.id, distance: 30, scale: 1.25 })
+
+    expect(store.promoteToBaseline(QHD27.id)).toBe(true)
+
+    expect(store.familiar.value).toEqual([
+      expect.objectContaining({ id: FHD.id }),
+      { id: QHD27.id, distance: 30, scale: 1.25 },
+    ])
+    expect(store.baselineId.value).toBe(QHD27.id)
+    expect(store.compareIds.value).not.toContain(QHD27.id)
+    expect(store.compareSettings.value).not.toHaveProperty(QHD27.id)
+    expect(store.compareEntries.value.map(({ display }) => display.id)).toEqual([
+      QHD27.id,
+      FHD.id,
+    ])
+    expect(entryOf(store, QHD27.id)).toMatchObject({
+      isBaseline: true,
+      isFamiliar: true,
+      distance: 30,
+      scale: 1.25,
+    })
+    expectBaselineInvariant(store)
+  })
+
+  it('keeps the distance and scale a candidate had when no setting was made', () => {
+    const { store } = createEnvironment()
+    store.toggleFamiliar(FHD.id)
+    store.toggleCompare(UW34.id)
+    const before = entryOf(store, UW34.id)
+
+    store.promoteToBaseline(UW34.id)
+
+    const familiarEntry = store.familiar.value.find(({ id }) => id === UW34.id)
+    expect(familiarEntry.distance).toBeCloseTo(before.distance, 9)
+    expect(familiarEntry.scale).toBe(before.scale)
+  })
+
+  it('leaves the former baseline familiar, and only one baseline is set', () => {
+    const { store } = createEnvironment()
+    store.toggleFamiliar(FHD.id)
+    store.toggleCompare(QHD27.id)
+
+    store.promoteToBaseline(QHD27.id)
+
+    expect(store.familiar.value.map(({ id }) => id)).toEqual([FHD.id, QHD27.id])
+    const baselines = store.compareEntries.value.filter(({ isBaseline }) => isBaseline)
+    expect(baselines.map(({ display }) => display.id)).toEqual([QHD27.id])
+  })
+
+  it('shows a hidden familiar display again when it becomes the baseline', () => {
+    const { store } = createEnvironment()
+    store.toggleFamiliar(FHD.id)
+    store.toggleFamiliar(UHD27.id)
+    store.toggleFamiliarHidden(UHD27.id)
+    expect(store.hiddenFamiliarIds.value).toEqual([UHD27.id])
+
+    expect(store.promoteToBaseline(UHD27.id)).toBe(true)
+
+    expect(store.hiddenFamiliarIds.value).toEqual([])
+    expect(store.compareEntries.value.map(({ display }) => display.id)).toEqual([
+      UHD27.id,
+      FHD.id,
+    ])
+    expect(entryOf(store, UHD27.id)).toMatchObject({ isBaseline: true })
+  })
+
+  it('refuses a display that is neither familiar nor compared, and changes nothing', () => {
+    const { store } = createEnvironment()
+    store.toggleFamiliar(FHD.id)
+    const before = structuredClone({
+      familiar: store.familiar.value,
+      baselineId: store.baselineId.value,
+      compareIds: store.compareIds.value,
+    })
+
+    expect(store.promoteToBaseline(QHD27.id)).toBe(false)
+    expect(store.promoteToBaseline('no-such-display')).toBe(false)
+
+    expect(store.familiar.value).toEqual(before.familiar)
+    expect(store.baselineId.value).toBe(before.baselineId)
+    expect(store.compareIds.value).toEqual(before.compareIds)
+  })
+
+  it('refuses a hidden built-in display, which is not in compare', () => {
+    const { store } = createEnvironment()
+    store.toggleFamiliar(FHD.id)
+    store.toggleCompare(QHD27.id)
+    store.hideBuiltIn(QHD27.id)
+    expect(store.promoteToBaseline(QHD27.id)).toBe(false)
+    expect(store.familiar.value.map(({ id }) => id)).toEqual([FHD.id])
+  })
+})
+
+describe('setBaseline shows the baseline', () => {
+  it('un-hides a familiar display that becomes the baseline', () => {
+    const { store } = createEnvironment()
+    store.toggleFamiliar(FHD.id)
+    store.toggleFamiliar(UHD27.id)
+    store.toggleFamiliarHidden(UHD27.id)
+
+    expect(store.setBaseline(UHD27.id)).toBe(true)
+
+    expect(store.hiddenFamiliarIds.value).toEqual([])
+    expect(store.compareEntries.value.map(({ display }) => display.id)[0]).toBe(UHD27.id)
+  })
+})
+
 describe('custom displays', () => {
   it('adds a trimmed display with a prefixed id and isCustom set', () => {
     const { store } = createEnvironment()

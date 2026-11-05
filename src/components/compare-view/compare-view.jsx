@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'preact/hooks'
-import { CompareVisual } from '../compare-visual/index.js'
+import {
+  CompareVisualControls,
+  CompareVisualPreview,
+} from '../compare-visual/compare-visual.jsx'
 import { CompareManager } from './compare-manager.jsx'
 import './compare-view.css'
 
@@ -32,13 +35,14 @@ const LazyCompareData = ({ entries, units }) => {
 }
 
 /**
- * The Compare view (PRD UX "2. Compare"): the visualization with its controls, the
- * membership manager, and the metric grid and scaling matrix.
+ * The Compare view (PRD UX "2. Compare"): the preview of the drawing, the per-display controls,
+ * the membership manager, and the metric grid and scaling matrix.
  *
- * Layout. From 900 px (`md`), the visualization is the left column and stays on screen
- * while the data scrolls on the right. Below that, the two stack, and the visualization
- * is pinned to the top of its block (`CompareVisual`) under the app header, whose
- * height the shell passes in as `--compare-visual-sticky-top`.
+ * Layout, the same at every width. The preview is the full width at the top and sticks under
+ * the app header (`--compare-visual-sticky-top`), capped at 60 % of the viewport height (PRD
+ * F11). Below it, the controls and the membership manager sit side by side from 900 px
+ * (`md`) and stack below that. The metric grid and the scaling matrix take the full width.
+ * The preview is a direct child of the flex column, so it sticks for the whole view.
  *
  * Every change goes out through a callback. The parent turns each one into a store
  * action. `entries` are CompareEntry objects, baseline first.
@@ -57,6 +61,7 @@ const LazyCompareData = ({ entries, units }) => {
  * @param {(payload: { id: string, kind: string }) => void} [props.onApplyEquivalent]
  * @param {(id: string) => void} [props.onToggleCompare] Adds or removes a candidate.
  * @param {(id: string) => void} [props.onToggleFamiliarHidden] Hides or shows a familiar display.
+ * @param {(id: string) => void} [props.onSetBaseline] Makes any compared display the baseline.
  * @param {() => void} [props.onGoBrowse] Returns to Browse from the empty hint.
  * @returns {import('preact').JSX.Element}
  *
@@ -83,33 +88,47 @@ export const CompareView = ({
   onApplyEquivalent,
   onToggleCompare,
   onToggleFamiliarHidden,
+  onSetBaseline,
   onGoBrowse,
 }) => (
   <div class="compare-view">
-    <div class="compare-view__visual">
-      <CompareVisual
+    <CompareVisualPreview
+      entries={entries}
+      mode={mode}
+      units={units}
+      sizeMatchBy={sizeMatchBy}
+      onModeChange={onModeChange}
+    />
+
+    <div class="compare-view__body">
+      <CompareVisualControls
         entries={entries}
         mode={mode}
         units={units}
         sizeMatchBy={sizeMatchBy}
-        onModeChange={onModeChange}
         onSizeMatchByChange={onSizeMatchByChange}
         onDistanceChange={onDistanceChange}
         onScaleChange={onScaleChange}
         onApplyEquivalent={onApplyEquivalent}
       />
+
+      <div class="compare-view__membership">
+        <CompareManager
+          entries={entries}
+          hiddenFamiliar={hiddenFamiliar}
+          addable={addable}
+          onToggleCompare={onToggleCompare}
+          onToggleFamiliarHidden={onToggleFamiliarHidden}
+          onSetBaseline={onSetBaseline}
+          onGoBrowse={onGoBrowse}
+        />
+      </div>
     </div>
 
-    <div class="compare-view__data">
-      <CompareManager
-        entries={entries}
-        hiddenFamiliar={hiddenFamiliar}
-        addable={addable}
-        onToggleCompare={onToggleCompare}
-        onToggleFamiliarHidden={onToggleFamiliarHidden}
-        onGoBrowse={onGoBrowse}
-      />
-      {entries.length > 0 && <LazyCompareData entries={entries} units={units} />}
-    </div>
+    {entries.length > 0 && (
+      <div class="compare-view__data">
+        <LazyCompareData entries={entries} units={units} />
+      </div>
+    )}
   </div>
 )

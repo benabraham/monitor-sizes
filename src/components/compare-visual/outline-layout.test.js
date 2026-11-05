@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import { getAngularMetrics, getDisplayMetrics } from '../../lib/calc/index.js'
-import { getOutlineLayout, LABEL_LINE } from './outline-layout.js'
+import {
+  getOutlineLayout,
+  LABEL_CHAR_WIDTH,
+  LABEL_INSET,
+  LABEL_LINE,
+  placeLabels,
+} from './outline-layout.js'
 
 const FHD_24 = { id: '24-fhd', name: 'FHD', diagonal: 24, width: 1920, height: 1080 }
 const UHD_32 = { id: '32-4k', name: '4K UHD', diagonal: 32, width: 3840, height: 2160 }
@@ -74,26 +80,37 @@ describe('getOutlineLayout: physical mode', () => {
     expect(byId(layout, '32-4k')).toMatchObject({ isBaseline: false, isFamiliar: false })
   })
 
-  it('fits the largest outline inside the padding, horizontally and vertically', () => {
+  it('fits the largest outline inside the padding, horizontally or vertically', () => {
     layout.outlines.forEach((outline) => {
       expect(outline.x).toBeGreaterThanOrEqual(VIEW.padding - 1e-6)
       expect(outline.x + outline.width).toBeLessThanOrEqual(
         VIEW.width - VIEW.padding + 1e-6,
       )
-      expect(outline.labelY).toBeGreaterThanOrEqual(VIEW.padding)
+      expect(outline.y).toBeGreaterThanOrEqual(VIEW.padding - 1e-6)
     })
     const widest = Math.max(...layout.outlines.map((outline) => outline.width))
-    const topLabel = Math.min(...layout.outlines.map((outline) => outline.labelY))
+    const highest = Math.min(...layout.outlines.map((outline) => outline.y))
     const touchesWidth = widest >= VIEW.width - 2 * VIEW.padding - 1e-3
-    const touchesHeight = topLabel - 13 <= VIEW.padding + 1e-3
+    const touchesHeight = highest <= VIEW.padding + 1e-3
     expect(touchesWidth || touchesHeight).toBe(true)
   })
 
-  it('places each label above its own outline', () => {
+  it('places each label inside its own outline, in the top-left corner', () => {
     layout.outlines.forEach((outline) => {
-      expect(outline.labelY).toBeLessThan(outline.y)
-      expect(outline.labelX).toBeCloseTo(VIEW.width / 2, 9)
+      expect(outline.labelX).toBeGreaterThanOrEqual(outline.x)
+      expect(outline.labelX).toBeLessThan(outline.x + outline.width)
+      expect(outline.labelY).toBeGreaterThan(outline.y)
     })
+  })
+
+  it('puts a lone label LABEL_INSET from the left and top edges of its outline', () => {
+    const [only] = getOutlineLayout({
+      entries: [entryFor({ display: FHD_24, distanceCm: 60, isBaseline: true })],
+      mode: 'physical',
+      ...VIEW,
+    }).outlines
+    expect(only.labelX).toBeCloseTo(only.x + LABEL_INSET, 9)
+    expect(only.labelY).toBeCloseTo(only.y + LABEL_INSET + 13, 9)
   })
 
   it('draws a desk line from padding to padding on the right', () => {
@@ -193,29 +210,174 @@ describe('getOutlineLayout: As seen mode', () => {
   })
 })
 
+/** Laptops of nearly the same size: their top-left corners are close together. */
+const LAPTOP_133 = { id: 'laptop-13', name: '13.3″', diagonal: 13.3, width: 2560, height: 1600 }
+const LAPTOP_14 = { id: 'laptop-14', name: '14″', diagonal: 14, width: 1920, height: 1080 }
+const LAPTOP_156 = { id: 'laptop-156', name: '15.6″', diagonal: 15.6, width: 1920, height: 1080 }
+
+/**
+ * Whether two labels overlap: their horizontal extents meet and their baselines are closer
+ * than one label line.
+ *
+ * @param {object} first Outline from the layout.
+ * @param {object} second Outline from the layout.
+ * @returns {boolean}
+ */
+const labelsOverlap = (first, second) =>
+  first.labelX < second.labelX + second.labelWidth &&
+  second.labelX < first.labelX + first.labelWidth &&
+  Math.abs(first.labelY - second.labelY) < LABEL_LINE - 1e-6
+
+/**
+ * Every pair of labels in a layout must be clear of each other.
+ *
+ * @param {object} layout
+ * @returns {void}
+ */
+const expectNoLabelOverlap = (layout) => {
+  layout.outlines.forEach((outline, index) => {
+    layout.outlines.slice(index + 1).forEach((other) => {
+      expect(labelsOverlap(outline, other), `${outline.id} and ${other.id}`).toBe(false)
+    })
+  })
+}
+
 describe('getOutlineLayout: labels', () => {
-  it('stacks labels so no two are closer than one label line', () => {
+  it('never lets two labels overlap, even for the nearly same size laptops', () => {
     const entries = [
-      entryFor({ display: FHD_24, distanceCm: 60, isBaseline: true }),
-      entryFor({ display: UHD_27, distanceCm: 60 }),
-      entryFor({ display: UHD_32, distanceCm: 60 }),
-      entryFor({ display: { ...FHD_24, id: 'twin' }, distanceCm: 60 }),
+      entryFor({ display: LAPTOP_133, distanceCm: 60, isBaseline: true }),
+      entryFor({ display: LAPTOP_14, distanceCm: 60 }),
+      entryFor({ display: LAPTOP_156, distanceCm: 60 }),
     ]
-    const layout = getOutlineLayout({ entries, mode: 'physical', ...VIEW })
-    const ys = layout.outlines.map((outline) => outline.labelY).sort((a, b) => a - b)
-    for (let index = 1; index < ys.length; index += 1) {
-      expect(ys[index] - ys[index - 1]).toBeGreaterThanOrEqual(LABEL_LINE - 1e-6)
-    }
+    expectNoLabelOverlap(getOutlineLayout({ entries, mode: 'physical', ...VIEW }))
   })
 
-  it('keeps labels where they do not collide even when outlines have equal tops', () => {
+  it('moves the later of two labels with the same corner down by exactly one line', () => {
     const entries = [
       entryFor({ display: FHD_24, distanceCm: 60, isBaseline: true }),
       entryFor({ display: { ...FHD_24, id: 'twin' }, distanceCm: 60 }),
     ]
+    const [first, second] = getOutlineLayout({ entries, mode: 'physical', ...VIEW })
+      .outlines
+    expect(first.labelX).toBeCloseTo(second.labelX, 9)
+    expect(second.labelY - first.labelY).toBeCloseTo(LABEL_LINE, 9)
+  })
+
+  it('stacks three labels with a shared corner one line apart each', () => {
+    const entries = [
+      entryFor({ display: FHD_24, distanceCm: 60, isBaseline: true }),
+      entryFor({ display: { ...FHD_24, id: 'twin-a' }, distanceCm: 60 }),
+      entryFor({ display: { ...FHD_24, id: 'twin-b' }, distanceCm: 60 }),
+    ]
+    const ys = getOutlineLayout({ entries, mode: 'physical', ...VIEW }).outlines.map(
+      (outline) => outline.labelY,
+    )
+    expect(ys[1] - ys[0]).toBeCloseTo(LABEL_LINE, 9)
+    expect(ys[2] - ys[1]).toBeCloseTo(LABEL_LINE, 9)
+  })
+
+  it('does not move a label that does not clash with another', () => {
+    const entries = [
+      entryFor({ display: FHD_24, distanceCm: 60, isBaseline: true }),
+      entryFor({ display: UHD_32, distanceCm: 80 }),
+    ]
     const layout = getOutlineLayout({ entries, mode: 'physical', ...VIEW })
-    const [first, second] = layout.outlines
-    expect(first.labelY).not.toBeCloseTo(second.labelY, 3)
+    layout.outlines.forEach((outline) => {
+      expect(outline.labelY).toBeCloseTo(outline.y + LABEL_INSET + 13, 9)
+    })
+  })
+
+  it('keeps every label inside the viewBox', () => {
+    const entries = [
+      entryFor({ display: LAPTOP_133, distanceCm: 60, isBaseline: true }),
+      entryFor({ display: LAPTOP_14, distanceCm: 60 }),
+      entryFor({ display: LAPTOP_156, distanceCm: 60 }),
+      entryFor({ display: UHD_32, distanceCm: 80 }),
+    ]
+    const layout = getOutlineLayout({ entries, mode: 'physical', ...VIEW })
+    layout.outlines.forEach((outline) => {
+      expect(outline.labelX).toBeGreaterThanOrEqual(VIEW.padding - 1e-6)
+      expect(outline.labelX + outline.labelWidth).toBeLessThanOrEqual(
+        VIEW.width - VIEW.padding + 1e-6,
+      )
+      expect(outline.labelY - 13).toBeGreaterThanOrEqual(VIEW.padding - 1e-6)
+      expect(outline.labelY + 4).toBeLessThanOrEqual(VIEW.height - VIEW.padding + 1e-6)
+    })
+  })
+
+  it('still draws and keeps the labels apart with six outlines of one size', () => {
+    const entries = Array.from({ length: 6 }, (_, index) =>
+      entryFor({
+        display: { ...UHD_27, id: `same-${index}` },
+        distanceCm: 60,
+        isBaseline: index === 0,
+      }),
+    )
+    const layout = getOutlineLayout({ entries, mode: 'physical', ...VIEW })
+    expect(layout.scale).toBeGreaterThan(0)
+    expectNoLabelOverlap(layout)
+    layout.outlines.forEach((outline) => {
+      expect(outline.labelY + 4).toBeLessThanOrEqual(VIEW.height - VIEW.padding + 1e-6)
+    })
+  })
+
+  it('sizes a label from the entry label text when one is given', () => {
+    const entries = [
+      { ...entryFor({ display: FHD_24, distanceCm: 60, isBaseline: true }), label: 'ab' },
+    ]
+    const [only] = getOutlineLayout({ entries, mode: 'physical', ...VIEW }).outlines
+    expect(only.labelWidth).toBeCloseTo(2 * LABEL_CHAR_WIDTH, 9)
+  })
+})
+
+describe('placeLabels', () => {
+  it('moves a label that clashes with a higher one down by one line', () => {
+    const positions = placeLabels({
+      outlines: [
+        { index: 0, x: 100, y: 50, labelWidth: 80 },
+        { index: 1, x: 110, y: 52, labelWidth: 80 },
+      ],
+      minX: 16,
+      maxX: 624,
+    })
+    expect(positions.get(0)).toEqual({ labelX: 106, labelY: 50 + LABEL_INSET + 13 })
+    expect(positions.get(1).labelY).toBeCloseTo(
+      50 + LABEL_INSET + 13 + LABEL_LINE,
+      9,
+    )
+  })
+
+  it('keeps a label where it is when the labels are side by side', () => {
+    const positions = placeLabels({
+      outlines: [
+        { index: 0, x: 0, y: 50, labelWidth: 100 },
+        { index: 1, x: 300, y: 50, labelWidth: 100 },
+      ],
+      minX: 0,
+      maxX: 640,
+    })
+    expect(positions.get(0).labelY).toBe(positions.get(1).labelY)
+  })
+
+  it('moves a label that is too far right back inside the right edge', () => {
+    const positions = placeLabels({
+      outlines: [{ index: 0, x: 600, y: 50, labelWidth: 100 }],
+      minX: 16,
+      maxX: 624,
+    })
+    expect(positions.get(0).labelX).toBe(524)
+  })
+
+  it('reports each label under its outline index', () => {
+    const positions = placeLabels({
+      outlines: [
+        { index: 4, x: 200, y: 90, labelWidth: 10 },
+        { index: 2, x: 10, y: 20, labelWidth: 10 },
+      ],
+      minX: 0,
+      maxX: 640,
+    })
+    expect([...positions.keys()]).toEqual([2, 4])
   })
 })
 

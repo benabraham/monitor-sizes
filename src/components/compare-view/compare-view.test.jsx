@@ -99,6 +99,7 @@ const viewProps = (overrides = {}) => ({
   onApplyEquivalent: vi.fn(),
   onToggleCompare: vi.fn(),
   onToggleFamiliarHidden: vi.fn(),
+  onSetBaseline: vi.fn(),
   onGoBrowse: vi.fn(),
   ...overrides,
 })
@@ -210,3 +211,77 @@ describe('CompareView', () => {
     ])
   })
 })
+
+describe('CompareView: Set as baseline in the manager', () => {
+  /** The manager's row for a display, found by its label. */
+  const rowOf = (name) =>
+    within(screen.getByRole('region', { name: 'Displays in this comparison' }))
+      .getAllByRole('listitem')
+      .find((item) => item.textContent.includes(name))
+
+  it('offers Set as baseline on a familiar row that is not the baseline', async () => {
+    const user = userEvent.setup()
+    const store = await hydratedStore({ familiar: familiarPair })
+    const props = viewProps({ entries: store.compareEntries.value })
+    render(<CompareView {...props} />)
+
+    await user.click(
+      screen.getByRole('button', { name: 'Set 27″ 4K as baseline' }),
+    )
+    expect(props.onSetBaseline).toHaveBeenCalledWith(UHD.id)
+  })
+
+  it('offers Set as baseline on a candidate row, and sends its id', async () => {
+    const user = userEvent.setup()
+    const store = await hydratedStore({ familiar: [familiarPair[0]], compare: [UW.id] })
+    const props = viewProps({ entries: store.compareEntries.value })
+    render(<CompareView {...props} />)
+
+    await user.click(screen.getByRole('button', { name: 'Set 34″ UW 34 as baseline' }))
+    expect(props.onSetBaseline).toHaveBeenCalledWith(UW.id)
+  })
+
+  it('offers Set as baseline on a hidden familiar row, and sends its id', async () => {
+    const user = userEvent.setup()
+    const store = await hydratedStore({ familiar: familiarPair })
+    const props = viewProps({
+      entries: store.compareEntries.value,
+      hiddenFamiliar: [MBP],
+    })
+    render(<CompareView {...props} />)
+
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Set 14.2″ MacBook Pro 14″ as baseline',
+      }),
+    )
+    expect(props.onSetBaseline).toHaveBeenCalledWith(MBP.id)
+  })
+
+  it('shows no Set as baseline button on the baseline row', async () => {
+    const store = await hydratedStore({ familiar: familiarPair, compare: [UW.id] })
+    render(<CompareView {...viewProps({ entries: store.compareEntries.value })} />)
+
+    const baselineRow = rowOf('24″ FHD')
+    expect(baselineRow.textContent).toContain('Baseline')
+    expect(within(baselineRow).queryByRole('button', { name: /as baseline$/ })).toBeNull()
+    expect(screen.getAllByRole('button', { name: /as baseline$/ })).toHaveLength(2)
+  })
+
+  it('keeps Hide and Remove next to the new button, on the rows they already had', async () => {
+    const store = await hydratedStore({ familiar: familiarPair, compare: [UW.id] })
+    render(<CompareView {...viewProps({ entries: store.compareEntries.value })} />)
+
+    const familiarRow = rowOf('27″ 4K')
+    expect(
+      within(familiarRow).getByRole('button', { name: 'Hide 27″ 4K from Compare' }),
+    ).not.toBeNull()
+    const candidateRow = rowOf('34″ UW 34')
+    expect(
+      within(candidateRow).getByRole('button', {
+        name: 'Remove 34″ UW 34 from Compare',
+      }),
+    ).not.toBeNull()
+  })
+})
+

@@ -4,7 +4,11 @@
  *
  * @module components/compare-visual
  */
-export { CompareVisual } from './compare-visual.jsx'
+export {
+  CompareVisual,
+  CompareVisualControls,
+  CompareVisualPreview,
+} from './compare-visual.jsx'
 export { DistanceControl } from './distance-control.jsx'
 export { EquivalenceLine } from './equivalence-line.jsx'
 export { getOutlineLayout } from './outline-layout.js'

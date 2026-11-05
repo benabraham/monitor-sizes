@@ -1,7 +1,7 @@
 /*
- * AppHeader. Sticky at the top of the page. Wide screens: one row with the nav in the
- * middle. Phones: the brand and actions share the first row and the nav takes a full
- * second row, so nothing overflows at 360 px.
+ * AppHeader. Sticky at the top of the page. Wide screens: one row with the nav and the scale
+ * preset in the middle. Phones: the brand and actions share the first row, the nav takes a full
+ * second row and the scale preset a full third row, so nothing overflows at 360 px.
  */
 
 .app-header {
@@ -51,6 +51,17 @@
   font-weight: var(--font-weight-semibold);
 }
 
+/* The preset switch sits after the nav. On wide screens it stays in the row. */
+.app-header__preset {
+  min-inline-size: 0;
+}
+
+.app-header__preset .segmented__text {
+  min-block-size: 36px;
+  padding-inline: var(--space-2) var(--space-3);
+  font-size: var(--font-size-sm);
+}
+
 .app-header__actions {
   display: flex;
   align-items: center;
@@ -97,5 +108,25 @@
   .app-header__add {
     padding-inline: 0;
     inline-size: 36px;
+  }
+
+  /* Phones: the preset switch takes its own full-width row under the nav. */
+  .app-header__preset {
+    order: 4;
+    inline-size: 100%;
+  }
+
+  .app-header__preset .segmented__options {
+    display: flex;
+    inline-size: 100%;
+  }
+
+  .app-header__preset .segmented__option {
+    flex: 1 1 0;
+  }
+
+  .app-header__preset .segmented__text {
+    justify-content: center;
+    padding-inline: var(--space-2);
   }
 }

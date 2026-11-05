@@ -21,10 +21,12 @@
   transform: none;
 }
 
+/*
+ * The layout uses the full window width, so wide tables need less horizontal scrolling. The
+ * gutters come from the body padding. Running text keeps its own measure (see the text blocks).
+ */
 .app-main {
   min-inline-size: 0;
-  max-inline-size: 80rem;
-  margin-inline: auto;
   padding-block: var(--space-4) var(--space-10);
 }
 

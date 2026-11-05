@@ -127,6 +127,7 @@ import {
  * @property {(id: string) => boolean} toggleFamiliar      adds with defaults, or removes
  * @property {(settings: { id: string, distance?: number, scale?: number }) => boolean} setFamiliarSettings
  * @property {(id: string) => boolean} setBaseline
+ * @property {(id: string) => boolean} promoteToBaseline  any compared display; a candidate becomes familiar
  * @property {(id: string) => boolean} toggleCompare      not for familiar displays
  * @property {(settings: { id: string, distance?: number, scale?: number }) => boolean} setCompareSettings
  * @property {(request: { id: string, kind: 'sameSize'|'sameSharpness'|'sameTextSize' }) => boolean} applyEquivalent
@@ -779,14 +780,42 @@ export const createStore = ({
   }
 
   /**
-   * Make a familiar display the baseline (F3).
+   * Make a familiar display the baseline (F3). The baseline is always in Compare, so a hidden
+   * display is shown again.
    *
    * @param {string} id
    * @returns {boolean} `false` when the display is not familiar.
    */
   const setBaseline = (id) => {
     if (!isFamiliarId(id)) return false
-    baselineId.value = id
+    batch(() => {
+      baselineId.value = id
+      hiddenFamiliarIds.value = hiddenFamiliarIds.value.filter((item) => item !== id)
+    })
+    return true
+  }
+
+  /**
+   * Make any compared display the baseline in one step (Compare's "Set as baseline"). A
+   * familiar display becomes the baseline, and is shown if it was hidden. A candidate first
+   * becomes a familiar display, keeping the distance and scale it has in Compare, and then
+   * the baseline. Exactly one familiar display is the baseline afterwards.
+   *
+   * @param {string} id
+   * @returns {boolean} `false` when the display is neither familiar nor in Compare.
+   */
+  const promoteToBaseline = (id) => {
+    if (isFamiliarId(id)) return setBaseline(id)
+    const entry = compareEntries.value.find(({ display }) => display.id === id)
+    if (!entry) return false
+    commit({
+      familiar: [
+        ...familiar.value,
+        { id, distance: entry.distance, scale: entry.scale },
+      ],
+      compareIds: compareIds.value.filter((item) => item !== id),
+      baselineId: id,
+    })
     return true
   }
 
@@ -1146,6 +1175,7 @@ export const createStore = ({
     toggleFamiliar,
     setFamiliarSettings,
     setBaseline,
+    promoteToBaseline,
     toggleCompare,
     setCompareSettings,
     applyEquivalent,

@@ -36,6 +36,26 @@ const badgeOf = ({ isBaseline, isFamiliar }) => {
 }
 
 /**
+ * The "Set as baseline" button of a manager row. Its accessible name includes the display
+ * name, so each row's button is told apart (for example "Set 27″ 4K UHD as baseline").
+ *
+ * @param {object} props
+ * @param {string} props.label Display label, as shown in the row.
+ * @param {() => void} props.onClick
+ * @returns {import('preact').JSX.Element}
+ */
+const SetBaselineButton = ({ label, onClick }) => (
+  <Button
+    variant="ghost"
+    size="sm"
+    aria-label={t('app.compare.setBaselineName', { name: label })}
+    onClick={onClick}
+  >
+    {t('app.compare.setBaseline')}
+  </Button>
+)
+
+/**
  * Who is in the comparison, and how to change it (PRD F13, F14). It holds the add field,
  * a list of the compared displays with their badge, and the hidden familiar displays.
  *
@@ -44,6 +64,8 @@ const badgeOf = ({ isBaseline, isFamiliar }) => {
  *   message.
  * - Familiar displays can be hidden from Compare and shown again. The baseline stays.
  * - Candidates can be removed from Compare.
+ * - Every row except the baseline can be made the baseline ("Set as baseline"). A candidate
+ *   becomes a familiar display first, and a hidden one is shown again.
  *
  * The distances and scales are edited in the visualization, not here. Every change
  * goes out through a callback.
@@ -56,6 +78,8 @@ const badgeOf = ({ isBaseline, isFamiliar }) => {
  *   be added to Compare.
  * @param {(id: string) => void} [props.onToggleCompare] Adds or removes a candidate.
  * @param {(id: string) => void} [props.onToggleFamiliarHidden] Hides or shows a familiar display.
+ * @param {(id: string) => void} [props.onSetBaseline] Makes a compared or hidden display the
+ *   baseline, promoting a candidate to familiar first.
  * @param {() => void} [props.onGoBrowse] Shown with the empty hint, to return to Browse.
  * @returns {import('preact').JSX.Element}
  *
@@ -73,6 +97,7 @@ export const CompareManager = ({
   addable = [],
   onToggleCompare,
   onToggleFamiliarHidden,
+  onSetBaseline,
   onGoBrowse,
 }) => {
   const idBase = useId()
@@ -145,26 +170,34 @@ export const CompareManager = ({
                 >
                   {badge.text}
                 </span>
-                {!entry.isBaseline && entry.isFamiliar && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    aria-label={t('app.compare.hideName', { name: label })}
-                    onClick={() => onToggleFamiliarHidden?.(display.id)}
-                  >
-                    {t('app.compare.hide')}
-                  </Button>
-                )}
-                {!entry.isFamiliar && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    aria-label={t('app.compare.removeName', { name: label })}
-                    onClick={() => onToggleCompare?.(display.id)}
-                  >
-                    {t('app.compare.remove')}
-                  </Button>
-                )}
+                <div class="compare-manager__actions">
+                  {!entry.isBaseline && (
+                    <SetBaselineButton
+                      label={label}
+                      onClick={() => onSetBaseline?.(display.id)}
+                    />
+                  )}
+                  {!entry.isBaseline && entry.isFamiliar && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      aria-label={t('app.compare.hideName', { name: label })}
+                      onClick={() => onToggleFamiliarHidden?.(display.id)}
+                    >
+                      {t('app.compare.hide')}
+                    </Button>
+                  )}
+                  {!entry.isFamiliar && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      aria-label={t('app.compare.removeName', { name: label })}
+                      onClick={() => onToggleCompare?.(display.id)}
+                    >
+                      {t('app.compare.remove')}
+                    </Button>
+                  )}
+                </div>
               </li>
             )
           })}
@@ -179,14 +212,20 @@ export const CompareManager = ({
                 <span class="compare-manager__badge compare-manager__badge--familiar">
                   {t('compareVisual.badge.familiar')}
                 </span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  aria-label={t('app.compare.showName', { name: label })}
-                  onClick={() => onToggleFamiliarHidden?.(display.id)}
-                >
-                  {t('app.compare.show')}
-                </Button>
+                <div class="compare-manager__actions">
+                  <SetBaselineButton
+                    label={label}
+                    onClick={() => onSetBaseline?.(display.id)}
+                  />
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    aria-label={t('app.compare.showName', { name: label })}
+                    onClick={() => onToggleFamiliarHidden?.(display.id)}
+                  >
+                    {t('app.compare.show')}
+                  </Button>
+                </div>
               </li>
             )
           })}

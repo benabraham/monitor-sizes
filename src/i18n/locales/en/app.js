@@ -35,6 +35,8 @@ export default {
     showName: 'Show {name} in Compare',
     remove: 'Remove',
     removeName: 'Remove {name} from Compare',
+    setBaseline: 'Set as baseline',
+    setBaselineName: 'Set {name} as baseline',
   },
   hidden: {
     title: 'Hidden built-in displays',

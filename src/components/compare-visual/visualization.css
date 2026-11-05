@@ -32,18 +32,34 @@
   line-height: var(--line-height-tight);
 }
 
+/*
+ * The figure is a size container, so the drawing picks its frame from the figure width: 16:9
+ * from 600 px, 4:3 on phones. The drawing is measured in JavaScript and laid out at its own
+ * size, so its labels keep their font size whatever the frame.
+ */
 .visualization__figure {
   margin: 0;
   min-inline-size: 0;
+  container-type: inline-size;
 }
 
 .visualization__svg {
   display: block;
   inline-size: 100%;
   block-size: auto;
+  --ratio-w: 4;
+  --ratio-h: 3;
+  aspect-ratio: var(--ratio-w) / var(--ratio-h);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   background-color: var(--color-surface);
+}
+
+@container (min-width: 600px) {
+  .visualization__svg {
+    --ratio-w: 16;
+    --ratio-h: 9;
+  }
 }
 
 .visualization__desk {
@@ -55,6 +71,8 @@
   fill-opacity: 0.08;
 }
 
+/* Labels sit in the outline's top-left corner. The surface-coloured halo keeps them readable
+   over the outline's own stroke and fill. */
 .visualization__label {
   fill: var(--color-text);
   font-family: var(--font-sans);

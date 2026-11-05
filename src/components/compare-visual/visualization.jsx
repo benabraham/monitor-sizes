@@ -12,43 +12,40 @@ const PALETTE_SIZE = 4
 /** Outline padding inside the drawing, in CSS pixels (1 viewBox unit = 1 px). */
 const PADDING = 16
 
-/** Width of the figure from which the wide 16:9 frame is used, as in the CSS. */
-const WIDE_FRAME_MIN_WIDTH = 600
+/** Drawing size used before the drawing is measured (and in tests without layout). */
+const FALLBACK_SIZE = { width: 640, height: 360 }
 
-/** Drawing width used before the figure is measured (and in tests without layout). */
-const FALLBACK_WIDTH = 640
+/** Border of the drawing, in CSS pixels (see visualization.css). It is outside the viewBox. */
+const DRAWING_BORDER = 1
 
 /** Counter for unique ids of the SVG title and description, one per mounted component. */
 let visualizationSequence = 0
 
 /**
- * Viewbox aspect ratio for a figure width: 16:9 when wide, 4:3 on phones.
+ * Measure the drawing's rendered size, and follow it with a ResizeObserver. The drawing is
+ * laid out at its own size, so one viewBox unit is one CSS pixel and the labels keep their
+ * font size, even when the drawing is capped in height (see compare-visual.css). Without
+ * layout (jsdom) or before the first measurement, the fallback size is used.
  *
- * @param {number} width Figure width in CSS pixels.
- * @returns {number} Width divided by height.
- *
- * @example
- * aspectRatioFor(800) // 16 / 9
- * aspectRatioFor(360) // 4 / 3
+ * @returns {{ ref: { current: SVGSVGElement | null }, width: number, height: number }}
  */
-const aspectRatioFor = (width) => (width >= WIDE_FRAME_MIN_WIDTH ? 16 / 9 : 4 / 3)
-
-/**
- * Measure the figure's width, and follow its size with a ResizeObserver. Without
- * layout (jsdom) or before the first measurement, the fallback width is used.
- *
- * @returns {{ ref: { current: HTMLElement | null }, width: number }}
- */
-const useFigureWidth = () => {
+const useDrawingSize = () => {
   const ref = useRef(null)
-  const [width, setWidth] = useState(FALLBACK_WIDTH)
+  const [size, setSize] = useState(FALLBACK_SIZE)
 
   useEffect(() => {
     const element = ref.current
     if (!element) return undefined
     const measure = () => {
-      const measured = Math.round(element.clientWidth)
-      if (measured > 0) setWidth(measured)
+      const box = element.getBoundingClientRect()
+      const width = Math.round(box.width - 2 * DRAWING_BORDER)
+      const height = Math.round(box.height - 2 * DRAWING_BORDER)
+      if (width <= 0 || height <= 0) return
+      setSize((previous) =>
+        previous.width === width && previous.height === height
+          ? previous
+          : { width, height },
+      )
     }
     measure()
     if (typeof ResizeObserver === 'undefined') return undefined
@@ -57,7 +54,7 @@ const useFigureWidth = () => {
     return () => observer.disconnect()
   }, [])
 
-  return { ref, width }
+  return { ref, ...size }
 }
 
 /**
@@ -119,7 +116,7 @@ const sizeTextOf = ({ entry, units, currentLocale, isSeen }) => {
 }
 
 /**
- * Label drawn above an outline: the short name, plus a baseline mark.
+ * Label drawn inside an outline: the short name, plus a baseline mark.
  *
  * @param {object} params
  * @param {object} params.entry CompareEntry.
@@ -138,7 +135,7 @@ const outlineLabelOf = ({ entry, currentLocale }) => {
  * Outlines are drawn in an SVG, one `rect` per entry, on the layout from
  * {@link getOutlineLayout}. Familiar displays have dashed outlines, candidates solid
  * ones, and the baseline is thicker and in the accent colour. Every outline has a
- * text label, and colour is never the only signal. A scale bar (10 cm, 4 in or 10°)
+ * text label in its top-left inner corner, and colour is never the only signal. A scale bar (10 cm, 4 in or 10°)
  * gives the size reference.
  *
  * The SVG is named by its title and description. The sizes are also listed as text
@@ -174,12 +171,15 @@ export const Visualization = ({
   onModeChange,
 }) => {
   const [idPrefix] = useState(() => `visualization-${++visualizationSequence}`)
-  const { ref, width } = useFigureWidth()
+  const { ref, width, height } = useDrawingSize()
   const currentLocale = locale.value
   const isSeen = mode === 'seen'
-  const height = Math.round(width / aspectRatioFor(width))
+  const labelled = entries.map((entry) => ({
+    ...entry,
+    label: outlineLabelOf({ entry, currentLocale }),
+  }))
   const layout = getOutlineLayout({
-    entries,
+    entries: labelled,
     mode: isSeen ? 'seen' : 'physical',
     width,
     height,
@@ -213,8 +213,9 @@ export const Visualization = ({
         />
       </div>
 
-      <figure class="visualization__figure" ref={ref}>
+      <figure class="visualization__figure">
         <svg
+          ref={ref}
           class="visualization__svg"
           viewBox={`0 0 ${width} ${height}`}
           role="img"
@@ -272,7 +273,6 @@ export const Visualization = ({
                 class="visualization__label"
                 x={outline.labelX}
                 y={outline.labelY}
-                text-anchor="middle"
                 paint-order="stroke"
                 stroke-width={4}
                 stroke-linejoin="round"

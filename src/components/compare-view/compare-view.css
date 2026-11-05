@@ -1,15 +1,25 @@
 /*
- * Compare view layout and the membership manager. Two columns from 900 px: the
- * visualization on the left stays in view while the data scrolls on the right.
+ * Compare view layout. The view is a flex column: the preview (sticky, full width) comes first,
+ * then the body (controls beside the membership from 900 px), then the metric grid and the
+ * scaling matrix at full width. The preview is a direct child of the column, so it sticks for
+ * the whole view (a grid item would only stick within its own row).
  */
 
 .compare-view {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: var(--space-6);
   min-inline-size: 0;
 }
 
-.compare-view__visual,
+.compare-view__body {
+  display: grid;
+  gap: var(--space-6);
+  align-items: start;
+  min-inline-size: 0;
+}
+
+.compare-view__membership,
 .compare-view__data {
   min-inline-size: 0;
 }
@@ -21,38 +31,9 @@
 }
 
 @media (min-width: 900px) {
-  .compare-view {
-    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
-    align-items: start;
+  .compare-view__body {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     column-gap: var(--space-6);
-  }
-
-  /*
-   * The visual column is the sticky panel. It sticks inside the grid row, which is as tall
-   * as the metrics column, so it stays on screen for the whole scroll. Taller than the
-   * viewport, it scrolls inside itself (PRD F11).
-   */
-  .compare-view__visual {
-    position: sticky;
-    top: var(--compare-visual-sticky-top, 0px);
-    max-block-size: calc(100dvh - var(--compare-visual-sticky-top, 0px) - var(--space-4));
-    overflow-y: auto;
-  }
-}
-
-/*
- * Phones: the drawing is pinned for the whole view, with the controls and the metrics
- * scrolling beneath it. Its sticky block must be the view itself, so the wrappers are
- * flattened here (display: contents) and the view stacks them in a column.
- */
-@media (max-width: 899px) {
-  .compare-view {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .compare-view__visual {
-    display: contents;
   }
 }
 
@@ -87,8 +68,8 @@
 }
 
 .compare-manager__item {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--space-2);
   padding: var(--space-2) var(--space-3);
@@ -104,7 +85,15 @@
 
 .compare-manager__name {
   min-inline-size: 0;
+  flex: 1 1 10rem;
   overflow-wrap: anywhere;
+}
+
+/* The row's buttons: the baseline button and the hide, show or remove button. */
+.compare-manager__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
 }
 
 .compare-manager__badge {

@@ -8,6 +8,12 @@ export default {
     label: 'Zobrazení',
     compareCount: 'Porovnat ({count})',
   },
+  preset: {
+    label: 'Předvolba měřítka',
+    windows: 'Windows',
+    macos: 'macOS',
+    linux: 'Linux',
+  },
   copyLink: {
     fieldLabel: 'Odkaz na toto porovnání',
     fallbackHint: 'Kopírování tady není dostupné. Odkaz je vybraný, zkopírujte ho ručně.',
