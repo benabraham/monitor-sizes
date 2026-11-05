@@ -48,22 +48,31 @@ items are sub-tasks. Keep this file current — rules in [`CLAUDE.md`](./CLAUDE.
 
 ## Wave 4 — integration and release
 
-- [ ] E2E: onboarding, compare flow, share-link round trip, offline reload, install check
-- [ ] Accessibility pass (keyboard, labels, contrast, text equivalent of the overlay)
-- [ ] Performance check: 200 displays recalculated < 16 ms; JS < 50 kB gzipped
+- [x] E2E: onboarding, compare flow, share-link round trip, offline reload, install check
+  - [x] 117 Playwright tests (desktop + phone projects), `docs/TESTING.md`
+- [x] Accessibility pass (keyboard, labels, contrast, text equivalent of the overlay)
+  - [x] axe (WCAG 2.2 AA) on every view, light and dark; focus traps and skip link
+- [x] Performance check: 200 displays recalculated < 16 ms; JS < 50 kB gzipped
   - [x] Store perf test: 200 displays ≈ 2 ms
   - [x] Bundle back under 50 kB (lazy per-locale catalogues + lazy compare data; 53.5 → 48.5 kB)
-  - [ ] More headroom: lazy-load onboarding, settings and add-display dialogs
-- [ ] README with screenshots and user guide
+  - [x] More headroom: lazy-load onboarding, settings and add-display dialogs
+- [x] README with screenshots and user guide
   - [x] README, USER-GUIDE (en, cs), CALCULATIONS
-  - [ ] Screenshots in `docs/screenshots/`
+  - [x] Screenshots in `docs/screenshots/`
 - [x] Layout polish from browser review
   - [x] Familiar chips: separate name and diagonal
   - [x] Compare desktop: only the visualization sticky, controls reachable
   - [x] Compare phone: cap the pinned visualization height
   - [x] Move the `.visually-hidden` clip fix into `global.css`
-- [ ] Optional: long-press on a display to add it to compare (PRD key interaction; checkbox already covers it)
+- [x] Optional: long-press on a display to add it to compare (PRD key interaction; checkbox already covers it)
 - [ ] Deploy to GitHub Pages
   - [x] Repo owner: make the repo public (or a plan with private Pages)
   - [ ] Repo owner: Settings → Pages → Source "GitHub Actions"
   - [ ] Verify the live app installs and works offline
+
+## Follow-ups
+
+- [ ] Show a message when a lazy chunk or language fails to load (currently silent)
+- [ ] Consider defaulting a candidate's distance by its own type (monitor 60 cm) instead of the baseline's distance when the baseline is a laptop (PRD F13 says baseline distance)
+- [ ] Bump GitHub Actions to Node 24 majors (deprecation warning)
+- [ ] Investigate a NumberField typing race seen while the lazy Compare data mounts
