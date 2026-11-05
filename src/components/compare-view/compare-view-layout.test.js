@@ -86,7 +86,9 @@ describe('compare view layout: preview', () => {
       css: compareVisual,
       selector: '.compare-visual__preview .visualization__svg',
     })
-    expect(drawing).toMatch(/max-block-size:\s*calc\(60dvh - var\(--compare-preview-chrome\)\)/)
+    expect(drawing).toMatch(
+      /max-block-size:\s*calc\(60dvh - var\(--compare-preview-chrome\)\)/,
+    )
     expect(drawing).toMatch(/inline-size:\s*min\(\s*100%/)
     expect(drawing).toMatch(/margin-inline:\s*auto/)
   })
@@ -113,7 +115,9 @@ describe('compare view layout: structure', () => {
     const [body] = declarationsOf({ css: compareView, selector: '.compare-view__body' })
     expect(body).toMatch(/display:\s*grid/)
     const wide = mediaBlockOf({ css: compareView, condition: 'min-width: 900px' })
-    expect(wide).toMatch(/\.compare-view__body\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s*minmax\(0,\s*1fr\)/)
+    expect(wide).toMatch(
+      /\.compare-view__body\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s*minmax\(0,\s*1fr\)/,
+    )
   })
 
   it('no longer has the old two-column sticky-left block', () => {

@@ -211,9 +211,27 @@ describe('getOutlineLayout: As seen mode', () => {
 })
 
 /** Laptops of nearly the same size: their top-left corners are close together. */
-const LAPTOP_133 = { id: 'laptop-13', name: '13.3″', diagonal: 13.3, width: 2560, height: 1600 }
-const LAPTOP_14 = { id: 'laptop-14', name: '14″', diagonal: 14, width: 1920, height: 1080 }
-const LAPTOP_156 = { id: 'laptop-156', name: '15.6″', diagonal: 15.6, width: 1920, height: 1080 }
+const LAPTOP_133 = {
+  id: 'laptop-13',
+  name: '13.3″',
+  diagonal: 13.3,
+  width: 2560,
+  height: 1600,
+}
+const LAPTOP_14 = {
+  id: 'laptop-14',
+  name: '14″',
+  diagonal: 14,
+  width: 1920,
+  height: 1080,
+}
+const LAPTOP_156 = {
+  id: 'laptop-156',
+  name: '15.6″',
+  diagonal: 15.6,
+  width: 1920,
+  height: 1080,
+}
 
 /**
  * Whether two labels overlap: their horizontal extents meet and their baselines are closer
@@ -257,8 +275,11 @@ describe('getOutlineLayout: labels', () => {
       entryFor({ display: FHD_24, distanceCm: 60, isBaseline: true }),
       entryFor({ display: { ...FHD_24, id: 'twin' }, distanceCm: 60 }),
     ]
-    const [first, second] = getOutlineLayout({ entries, mode: 'physical', ...VIEW })
-      .outlines
+    const [first, second] = getOutlineLayout({
+      entries,
+      mode: 'physical',
+      ...VIEW,
+    }).outlines
     expect(first.labelX).toBeCloseTo(second.labelX, 9)
     expect(second.labelY - first.labelY).toBeCloseTo(LABEL_LINE, 9)
   })
@@ -341,10 +362,7 @@ describe('placeLabels', () => {
       maxX: 624,
     })
     expect(positions.get(0)).toEqual({ labelX: 106, labelY: 50 + LABEL_INSET + 13 })
-    expect(positions.get(1).labelY).toBeCloseTo(
-      50 + LABEL_INSET + 13 + LABEL_LINE,
-      9,
-    )
+    expect(positions.get(1).labelY).toBeCloseTo(50 + LABEL_INSET + 13 + LABEL_LINE, 9)
   })
 
   it('ends, and keeps the labels apart, when the arithmetic leaves a line apart by a hair', () => {

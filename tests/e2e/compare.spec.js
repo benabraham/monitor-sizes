@@ -179,7 +179,10 @@ test.describe('compare', () => {
       const outside = boxes
         .filter(
           ({ box }) =>
-            box.left < svg.left || box.right > svg.right || box.top < svg.top || box.bottom > svg.bottom,
+            box.left < svg.left ||
+            box.right > svg.right ||
+            box.top < svg.top ||
+            box.bottom > svg.bottom,
         )
         .map(({ text }) => text)
       return { count: boxes.length, clashes, outside }
@@ -205,7 +208,9 @@ test.describe('compare', () => {
     await row.getByRole('button', { name: 'Set as baseline for 34″ UWQHD' }).click()
 
     await expect(row).toContainText('Baseline')
-    await expect(manager.getByRole('button', { name: 'Set as baseline for 34″ UWQHD' })).toHaveCount(0)
+    await expect(
+      manager.getByRole('button', { name: 'Set as baseline for 34″ UWQHD' }),
+    ).toHaveCount(0)
     await expect(
       page.locator('text.visualization__label', { hasText: '34″ UWQHD · Baseline' }),
     ).toHaveCount(1)

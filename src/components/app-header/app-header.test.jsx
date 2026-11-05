@@ -151,11 +151,16 @@ describe('AppHeader: scale preset switch', () => {
   it('follows the preset when it changes from outside, for example in Settings', () => {
     const { rerender } = renderHeader({ presetId: 'windows' })
     rerender(
-      <AppHeader view="browse" compareCount={3} onViewChange={() => {}} linkUrl="x" presetId="macos" />,
+      <AppHeader
+        view="browse"
+        compareCount={3}
+        onViewChange={() => {}}
+        linkUrl="x"
+        presetId="macos"
+      />,
     )
     const group = screen.getByRole('group', { name: 'Scale preset' })
     expect(within(group).getByRole('radio', { name: 'macOS' }).checked).toBe(true)
     expect(within(group).getByRole('radio', { name: 'Windows' }).checked).toBe(false)
   })
 })
-

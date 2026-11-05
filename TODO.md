@@ -72,10 +72,34 @@ items are sub-tasks. Keep this file current — rules in [`CLAUDE.md`](./CLAUDE.
   - [x] Interim test build published as a private claude.ai artifact (no offline/install there)
   - [x] Store survives refused `history.replaceState` (sandboxed frames)
 
+## Wave 5 — layout and comparison polish
+
+- [x] Drawing labels in the top-left inner corner of each outline, nudged down one line where two would clash (F11, F12)
+  - [x] `getOutlineLayout` returns label positions; `placeLabels` is pure and tested (no overlap, inside the viewBox)
+  - [x] Browser check: no two labels overlap at 1920, 1280 and 390 px, light and dark
+- [x] Layout uses the full window width: the 80 rem cap of the main column is gone; gutters stay (16 px, safe-area aware)
+- [x] Compare: "Set as baseline" on every membership row except the baseline (familiar, candidate and hidden rows) (F3, F13)
+  - [x] `promoteToBaseline(id)`: a candidate becomes familiar with its compare distance and scale, then the baseline
+  - [x] `setBaseline` shows a hidden display, so the baseline is always in Compare
+- [x] Compare layout: the preview (mode switch and drawing) is full width at the top, sticky, at most 60 dvh (F11)
+  - [x] Controls and membership side by side from 900 px, stacked below; metrics and matrix full width
+  - [x] The scaling matrix is one column until two fit (no inner scroll at 1280 px)
+- [x] OS scale preset switch in the app header (Windows, macOS, Linux), in sync with the Settings preset group (F21)
+- [x] Fix: a label clash check that could loop forever on floating point error (regression test)
+- [x] Fix: label widths were estimated too narrow for capitals; now 9 px a character
+- [x] Verification: unit tests, e2e (desktop and phone), browser screenshots, `docs/DESIGN.md` and `docs/ARCHITECTURE.md` updated
+
 ## Follow-ups
 
+- [x] Physical drawing: labels crowd when outlines are nearly the same size (e.g. 13–15.6″ laptops); stagger or use a legend (resolved in Wave 5: labels sit in the top-left corner and move down a line when they would clash)
+- [ ] Measure label text in the browser instead of estimating its width (`LABEL_CHAR_WIDTH`), if the estimate proves too narrow or too wide
+- [ ] Phone header is three rows (about 150 px tall): look for a more compact layout, so more of the preview stays visible
+- [ ] Compare preview at 1280 × 800: the 60 dvh cap leaves the drawing about 640 px wide. Check whether the caption can be shorter
+- [ ] `--compare-preview-chrome` (7.5 rem) is a hand-measured budget for the title, switch and caption. Re-measure it in the browser when those change
+- [ ] Header preset: the segment says "Linux", so its accessible name is not "Linux (Wayland)" as in Settings. Consider a title or a hint
+- [ ] Running text (help and onboarding paragraphs) may take a 70ch reading measure. Not done in Wave 5
+- [ ] Build warns that `ui/dialog/dialog.jsx` is both dynamically and statically imported (`INEFFECTIVE_DYNAMIC_IMPORT`)
 - [ ] Show a message when a lazy chunk or language fails to load (currently silent)
 - [ ] Consider defaulting a candidate's distance by its own type (monitor 60 cm) instead of the baseline's distance when the baseline is a laptop (PRD F13 says baseline distance)
-- [ ] Physical drawing: labels crowd when outlines are nearly the same size (e.g. 13–15.6″ laptops); stagger or use a legend
 - [ ] Bump GitHub Actions to Node 24 majors (deprecation warning)
 - [ ] Investigate a NumberField typing race seen while the lazy Compare data mounts

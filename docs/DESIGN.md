@@ -104,11 +104,11 @@ Breakpoints are documented in a comment in `tokens.css`, not as custom propertie
 properties cannot be used inside `@media`, so the values are written literally in the
 queries.
 
-| Breakpoint | Width   | Use                                                                                  |
-| ---------- | ------- | ------------------------------------------------------------------------------------ |
-| sm         | 600 px  | Phone ↔ desktop: cards ↔ table, bottom sheet ↔ popover, full-screen ↔ centred dialog |
-| md         | 900 px  | Two-column compare layout                                                            |
-| lg         | 1200 px | Wide desktop: sticky visualization panel beside metrics                              |
+| Breakpoint | Width   | Use                                                                                     |
+| ---------- | ------- | --------------------------------------------------------------------------------------- |
+| sm         | 600 px  | Phone ↔ desktop: cards ↔ table, bottom sheet ↔ popover, full-screen ↔ centred dialog    |
+| md         | 900 px  | Compare: controls and membership side by side (the preview is full width at every size) |
+| lg         | 1200 px | Not used by a query. The layout is the same from 900 px up, and it uses the full width  |
 
 ### Utilities (`global.css`)
 
@@ -128,10 +128,58 @@ or an icon.
 | ------------------- | ------------------------------------------------------------------------ | ---------------------------------------------------------------------- |
 | Baseline            | `--color-accent`, solid outline, `Chip isAccent`, accent row/outline     | Label "Baseline", 2 px outline                                         |
 | Familiar            | `--color-familiar`, **dashed** outline, `Chip isDashed`                  | Dash pattern, star icon                                                |
-| Candidate           | `--color-control`, **solid** outline                                     | Solid stroke, label on every outline                                   |
+| Candidate           | `--color-control`, **solid** outline                                     | Solid stroke, label in the top-left corner of every outline            |
 | Comfortable         | `--color-positive-subtle` background with `--color-positive-subtle-text` | Cell text stays readable; the matrix component should add a marker too |
 | Selected / on       | `--color-accent-subtle` fill (chips), `--color-accent` fill (segments)   | Check icon on chips; `aria-pressed`, checked radio                     |
 | Positive / negative | `--color-positive` / `--color-negative` text                             | Sign (`+`, `−`) and the word "same"                                    |
+
+## Compare layout
+
+Compare is one column at every width, so the drawing can stick at the top of the view:
+
+| Block                                    | Where                                  | Notes                                                                                                     |
+| ---------------------------------------- | -------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| Preview (`.compare-visual__preview`)     | Full width, first in the view          | Mode switch and drawing. Sticky under the app header (`--compare-visual-sticky-top`). Surface background. |
+| Controls (`.compare-visual__controls`)   | Second block, left column from 900 px  | Text sizes, "Match size by", one distance and scale control per display, with its equivalence line.       |
+| Membership (`.compare-view__membership`) | Second block, right column from 900 px | The displays in this comparison: Set as baseline, Hide or Show, Remove, and the add field.                |
+| Data (`.compare-view__data`)             | Full width, last                       | Metric grid, then the scaling matrix. The matrix is one column until two can fit (40 rem each).           |
+
+The preview is a direct child of the view, which is a flex column. A sticky element is held by
+its containing block, and a grid item's block is its own row, so a sticky preview inside a grid
+would not stick for the whole view.
+
+**Height cap.** The preview (mode switch and drawing together) is at most `60dvh`. The drawing
+takes what is left after `--compare-preview-chrome` (the title, the switch and the caption), at
+the frame's ratio: 16:9 from 600 px, 4:3 on phones. The drawing is measured after layout and
+laid out at its own size, so one viewBox unit is one CSS pixel and the labels keep their font
+size whatever the cap.
+
+**Phones.** The header has three rows: the brand and actions, the views, and the scale preset.
+The preview sticks under all of them, so the header's height is the sticky top. The preview
+takes up to 60 % of the viewport, and the content scrolls under it.
+
+## Drawing labels
+
+Every outline has one label, inside its top-left corner, `LABEL_INSET` (6 px) from the left and
+top edges, on a surface-coloured halo (`paint-order: stroke`) so it stays readable over the
+outline's own stroke and fill.
+
+Outlines share their bottom centre, so the nested ones have distinct corners. When two labels
+would overlap (outlines of nearly the same size, such as 13.3″, 14″ and 15.6″ laptops), the later
+one moves down one line (`LABEL_LINE`, 18 px) below the one it would clash with. The placement is
+in `placeLabels` (`outline-layout.js`), in pure code, and tested. Labels stay inside the viewBox,
+so the fit of the drawing takes them into account.
+
+Label width is estimated from the text (`LABEL_CHAR_WIDTH`, 9 px a character, generous on purpose),
+because the layout is pure and cannot measure text. The e2e spec checks the rendered boxes.
+
+## Header: scale preset
+
+The OS scale preset (Windows, macOS, Linux) is a `Segmented` in the app header, after the
+views, so it is one tap away in Browse and in Compare. It is the same setting as the
+Settings panel's preset group, read from and written to the same store signal. The header
+labels are short ("Linux"); Settings keeps the full name ("Linux (Wayland)"). On phones it has its
+own full-width row under the views.
 
 ## Accessibility
 
@@ -150,7 +198,8 @@ visually hidden or styled.
 **Targets.** Buttons are 28 px (`sm`) and 36 px (`md`), above the 24 px minimum of WCAG 2.5.8.
 `md` grows to 44 px on coarse pointers. Chips are 28 px tall.
 
-**Names and states.**
+**Names and states.** Visible text is part of the accessible name (WCAG 2.5.3): the "Set as
+baseline" button is named "Set as baseline for 27″ 4K UHD", not the other way round.
 
 - `Button` and `Chip` (toggle) use native buttons. Toggle chips expose `aria-pressed`.
 - Icon-only buttons need `aria-label`. In development the component warns when it is missing.

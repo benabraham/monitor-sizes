@@ -225,9 +225,7 @@ describe('CompareView: Set as baseline in the manager', () => {
     const props = viewProps({ entries: store.compareEntries.value })
     render(<CompareView {...props} />)
 
-    await user.click(
-      screen.getByRole('button', { name: 'Set as baseline for 27″ 4K' }),
-    )
+    await user.click(screen.getByRole('button', { name: 'Set as baseline for 27″ 4K' }))
     expect(props.onSetBaseline).toHaveBeenCalledWith(UHD.id)
   })
 
@@ -237,7 +235,9 @@ describe('CompareView: Set as baseline in the manager', () => {
     const props = viewProps({ entries: store.compareEntries.value })
     render(<CompareView {...props} />)
 
-    await user.click(screen.getByRole('button', { name: 'Set as baseline for 34″ UW 34' }))
+    await user.click(
+      screen.getByRole('button', { name: 'Set as baseline for 34″ UW 34' }),
+    )
     expect(props.onSetBaseline).toHaveBeenCalledWith(UW.id)
   })
 
@@ -264,8 +264,12 @@ describe('CompareView: Set as baseline in the manager', () => {
 
     const baselineRow = rowOf('24″ FHD')
     expect(baselineRow.textContent).toContain('Baseline')
-    expect(within(baselineRow).queryByRole('button', { name: /^Set as baseline for / })).toBeNull()
-    expect(screen.getAllByRole('button', { name: /^Set as baseline for / })).toHaveLength(2)
+    expect(
+      within(baselineRow).queryByRole('button', { name: /^Set as baseline for / }),
+    ).toBeNull()
+    expect(screen.getAllByRole('button', { name: /^Set as baseline for / })).toHaveLength(
+      2,
+    )
   })
 
   it('keeps Hide and Remove next to the new button, on the rows they already had', async () => {
@@ -284,4 +288,3 @@ describe('CompareView: Set as baseline in the manager', () => {
     ).not.toBeNull()
   })
 })
-

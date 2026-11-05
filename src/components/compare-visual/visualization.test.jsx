@@ -223,4 +223,3 @@ describe('Visualization: labels in the top-left inner corner', () => {
     })
   })
 })
-

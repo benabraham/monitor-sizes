@@ -809,10 +809,7 @@ export const createStore = ({
     const entry = compareEntries.value.find(({ display }) => display.id === id)
     if (!entry) return false
     commit({
-      familiar: [
-        ...familiar.value,
-        { id, distance: entry.distance, scale: entry.scale },
-      ],
+      familiar: [...familiar.value, { id, distance: entry.distance, scale: entry.scale }],
       compareIds: compareIds.value.filter((item) => item !== id),
       baselineId: id,
     })

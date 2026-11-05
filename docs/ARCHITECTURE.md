@@ -444,7 +444,8 @@ validating action returns `false` and changes nothing when its input is refused.
 | ------------------------------------------------------------------------------------------- | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `toggleFamiliar(id)`                                                                        | `boolean`          | adds with `defaultDistanceFor` and the best scale (F2); removing the baseline moves it to the first remaining display (F3)                                                                                                                                           |
 | `setFamiliarSettings({ id, distance?, scale? })`                                            | `boolean`          | partial; `false` for a display that is not familiar                                                                                                                                                                                                                  |
-| `setBaseline(id)`                                                                           | `boolean`          | familiar displays only                                                                                                                                                                                                                                               |
+| `setBaseline(id)`                                                                           | `boolean`          | familiar displays only. Shows the baseline if it was hidden in Compare                                                                                                                                                                                               |
+| `promoteToBaseline(id)`                                                                     | `boolean`          | any compared display (Compare's "Set as baseline"). A candidate becomes familiar first, with the distance and scale it has in Compare; `false` for a display that is neither familiar nor compared                                                                   |
 | `toggleCompare(id)`                                                                         | `boolean`          | candidates only. Removing forgets its settings. Familiar displays are refused: hide them with `toggleFamiliarHidden`                                                                                                                                                 |
 | `setCompareSettings({ id, distance?, scale? })`                                             | `boolean`          | a familiar id routes to `setFamiliarSettings`. A candidate must be in Compare                                                                                                                                                                                        |
 | `applyEquivalent({ id, kind })`                                                             | `boolean`          | `kind` is `sameSize`, `sameSharpness` or `sameTextSize` (F15). Refused for the baseline, or without a baseline                                                                                                                                                       |
@@ -534,17 +535,18 @@ Storage failures are the storage module's business: `savePersisted` never reject
 
 ## Components (waves 2–3)
 
-| Component        | Wave | Responsibility                                                                                                                |
-| ---------------- | ---- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `app`            | 2    | shell: header, view switch (Browse/Compare), onboarding gate, Add display dialog host                                         |
-| `toolbar`        | 2    | units, language, preset radio + custom scales, comfort window (with PPI/PPD toggle), copy link                                |
-| `help-popover`   | 2    | `?` button + Popover API panel, click/keyboard only                                                                           |
-| `ui` primitives  | 2    | `button`, `chip`, `dialog` (native `<dialog>`), `segmented` (radio group), `number-field`                                     |
-| `browse`         | 3    | familiar strip, search & filters, sortable table (desktop) / cards (phone), star & compare toggles                            |
-| `compare-visual` | 3    | always-visible SVG visualization (Physical ⇄ As seen), per-display distance + scale controls, match buttons, equivalence line |
-| `compare-data`   | 3    | metric grid (baseline first, angular metrics), full scaling matrix with highlighting                                          |
-| `add-display`    | 3    | four-field form, live preview, resolution presets, "I know this one"                                                          |
-| `onboarding`     | 3    | first-run: pick ≥ 1 familiar display (or add one), distance + scale each, units                                               |
+| Component        | Wave | Responsibility                                                                                                                                            |
+| ---------------- | ---- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `app`            | 2    | shell: header (view switch, OS scale preset, Add display, copy link, settings), onboarding gate, Add display dialog host                                  |
+| `toolbar`        | 2    | units, language, preset radio + custom scales, comfort window (with PPI/PPD toggle), copy link                                                            |
+| `help-popover`   | 2    | `?` button + Popover API panel, click/keyboard only                                                                                                       |
+| `ui` primitives  | 2    | `button`, `chip`, `dialog` (native `<dialog>`), `segmented` (radio group), `number-field`                                                                 |
+| `browse`         | 3    | familiar strip, search & filters, sortable table (desktop) / cards (phone), star & compare toggles                                                        |
+| `compare-visual` | 3    | the preview (SVG visualization, Physical ⇄ As seen, full width, sticky, ≤ 60 dvh), per-display distance + scale controls, match buttons, equivalence line |
+| `compare-view`   | 3    | Compare layout (preview, controls and membership, metrics and matrix), membership manager with Set as baseline, Hide, Remove                              |
+| `compare-data`   | 3    | metric grid (baseline first, angular metrics), full scaling matrix with highlighting                                                                      |
+| `add-display`    | 3    | four-field form, live preview, resolution presets, "I know this one"                                                                                      |
+| `onboarding`     | 3    | first-run: pick ≥ 1 familiar display (or add one), distance + scale each, units                                                                           |
 
 **Lazy chunks.** Onboarding, the Compare view, the display actions dialog, the Add display dialog
 and the settings dialog are loaded the first time they are wanted, through `useLazyModule`
