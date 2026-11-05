@@ -51,15 +51,18 @@ describe('compare view layout', () => {
   })
 
   it('flattens the visual wrappers on phones so the pinned drawing sticks for the whole view', () => {
-    const [flatVisual] = declarationsOf({ css: compareView, selector: '.compare-view__visual' }).filter(
-      (body) => /display:\s*contents/.test(body),
-    )
-    const [flatVisualBlock] = declarationsOf({ css: compareVisual, selector: '.compare-visual' }).filter(
-      (body) => /display:\s*contents/.test(body),
-    )
-    const [stack] = declarationsOf({ css: compareView, selector: '.compare-view' }).filter((body) =>
-      /flex-direction:\s*column/.test(body),
-    )
+    const [flatVisual] = declarationsOf({
+      css: compareView,
+      selector: '.compare-view__visual',
+    }).filter((body) => /display:\s*contents/.test(body))
+    const [flatVisualBlock] = declarationsOf({
+      css: compareVisual,
+      selector: '.compare-visual',
+    }).filter((body) => /display:\s*contents/.test(body))
+    const [stack] = declarationsOf({
+      css: compareView,
+      selector: '.compare-view',
+    }).filter((body) => /flex-direction:\s*column/.test(body))
 
     expect(flatVisual).toBeDefined()
     expect(flatVisualBlock).toBeDefined()
@@ -67,7 +70,10 @@ describe('compare view layout', () => {
   })
 
   it('keeps the pinned drawing sticky on phones', () => {
-    const [pinned] = declarationsOf({ css: compareVisual, selector: '.compare-visual__pinned' })
+    const [pinned] = declarationsOf({
+      css: compareVisual,
+      selector: '.compare-visual__pinned',
+    })
     expect(pinned).toMatch(/position:\s*sticky/)
   })
 })

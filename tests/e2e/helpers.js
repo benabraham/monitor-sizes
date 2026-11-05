@@ -105,10 +105,15 @@ export const completeOnboarding = async ({
     if (!values) continue
     const row = page.getByRole('group', { name: startsWith(display.name) })
     if (values.distance !== undefined) {
-      await fillNumber(row.getByRole('textbox', { name: 'Distance' }), String(values.distance))
+      await fillNumber(
+        row.getByRole('textbox', { name: 'Distance' }),
+        String(values.distance),
+      )
     }
     if (values.scale !== undefined) {
-      await row.getByRole('combobox', { name: 'Scale' }).selectOption(String(values.scale))
+      await row
+        .getByRole('combobox', { name: 'Scale' })
+        .selectOption(String(values.scale))
     }
   }
 
@@ -134,7 +139,9 @@ export const expectBrowse = (page) =>
  */
 export const goToView = async (page, view) => {
   const nav = page.getByRole('navigation', { name: 'Views' })
-  await nav.getByRole('button', { name: view === 'compare' ? /^Compare/ : 'Browse' }).click()
+  await nav
+    .getByRole('button', { name: view === 'compare' ? /^Compare/ : 'Browse' })
+    .click()
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(
     view === 'compare' ? 'Compare' : 'Browse',
   )
@@ -212,7 +219,9 @@ export const addToCompare = async (page, display) => {
  * @returns {Promise<import('@playwright/test').Locator>} The dialog.
  */
 export const openDisplayActions = async (page, display) => {
-  await displayItem(page, display).getByRole('button', { name: display.name, exact: true }).click()
+  await displayItem(page, display)
+    .getByRole('button', { name: display.name, exact: true })
+    .click()
   const dialog = page.getByRole('dialog', { name: display.name, exact: true })
   await expect(dialog).toBeVisible()
   return dialog
@@ -258,7 +267,8 @@ export const fillAddDisplay = async ({
   if (diagonal !== undefined) {
     await fillNumber(dialog.getByRole('textbox', { name: 'Diagonal' }), diagonal)
   }
-  if (width !== undefined) await fillNumber(dialog.getByRole('textbox', { name: 'Width' }), width)
+  if (width !== undefined)
+    await fillNumber(dialog.getByRole('textbox', { name: 'Width' }), width)
   if (height !== undefined) {
     await fillNumber(dialog.getByRole('textbox', { name: 'Height' }), height)
   }

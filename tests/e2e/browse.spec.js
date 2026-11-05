@@ -23,17 +23,25 @@ test.describe('browse', () => {
     await completeOnboarding({ page, displays: [DISPLAYS.mbp14, DISPLAYS.uhd27] })
   })
 
-  test('@desktop sorting by PPI toggles aria-sort and orders the rows', async ({ page }) => {
+  test('@desktop sorting by PPI toggles aria-sort and orders the rows', async ({
+    page,
+  }) => {
     const header = page.getByRole('columnheader', { name: /^PPI/ })
     const sortButton = header.getByRole('button', { name: 'PPI', exact: true })
     /** PPI values down the table, in row order. */
     const ppis = () =>
-      page.locator('tbody tr').evaluateAll((rows) =>
-        rows.map((row) => Number(row.children[4]?.textContent.replace(/\s/g, ''))),
-      )
+      page
+        .locator('tbody tr')
+        .evaluateAll((rows) =>
+          rows.map((row) => Number(row.children[4]?.textContent.replace(/\s/g, ''))),
+        )
     const isSortedBy = (values, direction) =>
-      values.every((value, index) =>
-        index === 0 || (direction === 'ascending' ? values[index - 1] <= value : values[index - 1] >= value),
+      values.every(
+        (value, index) =>
+          index === 0 ||
+          (direction === 'ascending'
+            ? values[index - 1] <= value
+            : values[index - 1] >= value),
       )
 
     // The table starts sorted by PPI, highest first.
@@ -63,10 +71,14 @@ test.describe('browse', () => {
   test('the comfortable-only filter reduces the list', async ({ page }) => {
     const before = await shownCount(page)
 
-    await page.getByRole('checkbox', { name: 'Only displays with a comfortable scale' }).check()
+    await page
+      .getByRole('checkbox', { name: 'Only displays with a comfortable scale' })
+      .check()
 
     await expect.poll(() => shownCount(page)).toBeLessThan(before)
-    await expect(page.getByRole('checkbox', { name: 'Only displays with a comfortable scale' })).toBeChecked()
+    await expect(
+      page.getByRole('checkbox', { name: 'Only displays with a comfortable scale' }),
+    ).toBeChecked()
   })
 
   test('starring a display adds it to the familiar strip', async ({ page }) => {
@@ -93,12 +105,16 @@ test.describe('browse', () => {
     await expect(uhd).toContainText('Baseline')
     await expect(mbp).not.toContainText('Baseline')
     // The new baseline is compared with itself, so its relative size reads "same".
-    await expect(displayItem(page, DISPLAYS.uhd27).getByText('same', { exact: true }).first()).toBeVisible()
+    await expect(
+      displayItem(page, DISPLAYS.uhd27).getByText('same', { exact: true }).first(),
+    ).toBeVisible()
   })
 
   test('@desktop shows the sortable table', async ({ page }) => {
     expect(isNarrow(page)).toBe(false)
-    await expect(page.getByRole('table', { name: 'Displays compared with the baseline' })).toBeVisible()
+    await expect(
+      page.getByRole('table', { name: 'Displays compared with the baseline' }),
+    ).toBeVisible()
     await expect(
       page
         .getByRole('row')
@@ -109,7 +125,9 @@ test.describe('browse', () => {
 
   test('@phone shows the displays as cards, not a table', async ({ page }) => {
     expect(isNarrow(page)).toBe(true)
-    await expect(page.getByRole('table', { name: 'Displays compared with the baseline' })).toBeHidden()
+    await expect(
+      page.getByRole('table', { name: 'Displays compared with the baseline' }),
+    ).toBeHidden()
 
     const card = displayItem(page, DISPLAYS.uhd27)
     await expect(card).toBeVisible()
@@ -119,6 +137,10 @@ test.describe('browse', () => {
 
   test('the Compare button in Browse opens the comparison', async ({ page }) => {
     await goToView(page, 'compare')
-    await expect(page.getByRole('navigation', { name: 'Views' }).getByRole('button', { name: 'Compare (2)' })).toBeVisible()
+    await expect(
+      page
+        .getByRole('navigation', { name: 'Views' })
+        .getByRole('button', { name: 'Compare (2)' }),
+    ).toBeVisible()
   })
 })

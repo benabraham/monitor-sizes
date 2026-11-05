@@ -149,12 +149,7 @@ describe('Dialog', () => {
   })
   it('wraps Tab from the last control to the first, and Shift+Tab back', () => {
     render(
-      <Dialog
-        isOpen
-        title="Trap"
-        onClose={() => {}}
-        footer={<button>Save</button>}
-      >
+      <Dialog isOpen title="Trap" onClose={() => {}} footer={<button>Save</button>}>
         <button>Middle</button>
       </Dialog>,
     )
