@@ -31,6 +31,7 @@ test.describe('first run onboarding (PRD F2, F3)', () => {
     await page.goto(APP_PATH)
     const search = page.getByRole('searchbox', { name: 'Search displays' })
     const allCheckboxes = page.getByRole('checkbox')
+    await expect(allCheckboxes.first()).toBeVisible()
     const total = await allCheckboxes.count()
 
     await search.fill('MacBook')
