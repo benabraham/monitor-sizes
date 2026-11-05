@@ -1403,3 +1403,28 @@ describe('flush', () => {
     expect(lastSaved(storage).preferences.units).toBe('imperial')
   })
 })
+
+describe('URL sync robustness', () => {
+  it('keeps working when history.replaceState throws (sandboxed frames)', async () => {
+    const history = {
+      replaceState: () => {
+        throw new Error('SecurityError')
+      },
+    }
+    const location = { hash: '' }
+    const store = createStore({
+      storage: {
+        loadPersisted: async () => structuredClone(EMPTY_STORED),
+        savePersisted: async () => {},
+      },
+      location,
+      history,
+      detectPreset: () => 'windows',
+      detectLang: () => 'en',
+    })
+    await store.hydrate()
+    expect(() => store.setUnits('imperial')).not.toThrow()
+    await store.flush()
+    expect(store.units.value).toBe('imperial')
+  })
+})

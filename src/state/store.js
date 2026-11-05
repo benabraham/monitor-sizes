@@ -496,7 +496,12 @@ export const createStore = ({
     const hash = pendingUrl
     pendingUrl = null
     if (!location || !history || location.hash === hash) return
-    history.replaceState(null, '', hash)
+    try {
+      history.replaceState(null, '', hash)
+    } catch {
+      // Sandboxed frames can refuse history updates; the app keeps working without a
+      // shareable URL rather than breaking.
+    }
   }
 
   /**
