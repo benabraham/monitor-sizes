@@ -170,8 +170,10 @@ set for it.
 
 ### Presets and custom scales
 
-Each operating system offers its own steps. Choose a preset under **Scale preset** in Settings.
-The app starts with the preset for the system you are using.
+Each operating system offers its own steps. Choose a preset with the **Windows / macOS / Linux**
+switch in the header, in Browse and in Compare. The same choice is under **Scale preset** in
+Settings, where the Linux preset is called **Linux (Wayland)**. The app starts with the preset for
+the system you are using.
 
 - **Windows:** 100 %, 125 %, 150 %, 175 % and 200 %.
 - **Linux (Wayland):** 100 %, 110 %, 125 %, 150 %, 175 % and 200 %. The 110 % step appears only in

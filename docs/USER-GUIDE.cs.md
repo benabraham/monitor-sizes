@@ -171,8 +171,10 @@ vzdálenost, kterou pro něj nastavíte.
 
 ### Předvolby a vlastní měřítka
 
-Každý operační systém nabízí vlastní kroky. Předvolbu vyberete v Nastavení v části **Předvolba
-měřítka**. Aplikace začíná s předvolbou systému, který používáte.
+Každý operační systém nabízí vlastní kroky. Předvolbu vyberete přepínačem **Windows / macOS / Linux**
+v záhlaví, v Procházení i v porovnání. Stejná volba je v Nastavení v části **Předvolba měřítka**,
+kde se předvolba Linuxu jmenuje **Linux (Wayland)**. Aplikace začíná s předvolbou systému, který
+používáte.
 
 - **Windows:** 100 %, 125 %, 150 %, 175 % a 200 %.
 - **Linux (Wayland):** 100 %, 110 %, 125 %, 150 %, 175 % a 200 %. Krok 110 % je jen v této
