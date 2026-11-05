@@ -69,6 +69,8 @@ items are sub-tasks. Keep this file current — rules in [`CLAUDE.md`](./CLAUDE.
   - [x] Repo owner: make the repo public (or a plan with private Pages)
   - [ ] Repo owner: Settings → Pages → Source "GitHub Actions"
   - [ ] Verify the live app installs and works offline
+  - [x] Interim test build published as a private claude.ai artifact (no offline/install there)
+  - [x] Store survives refused `history.replaceState` (sandboxed frames)
 
 ## Follow-ups
 
