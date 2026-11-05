@@ -347,6 +347,21 @@ describe('placeLabels', () => {
     )
   })
 
+  it('ends, and keeps the labels apart, when the arithmetic leaves a line apart by a hair', () => {
+    // Baselines 22.8 and 40.8: their difference is 17.999999999999996, a hair under one line.
+    const positions = placeLabels({
+      outlines: [
+        { index: 0, x: 100, y: 3.8000000000000003, labelWidth: 60 },
+        { index: 1, x: 100, y: 3.8000000000000003, labelWidth: 60 },
+      ],
+      minX: 0,
+      maxX: 640,
+    })
+    const first = positions.get(0).labelY
+    const second = positions.get(1).labelY
+    expect(second - first).toBeCloseTo(LABEL_LINE, 9)
+  })
+
   it('keeps a label where it is when the labels are side by side', () => {
     const positions = placeLabels({
       outlines: [

@@ -146,6 +146,7 @@ test.describe('compare', () => {
   test('the preview spans the full width and takes at most 60 % of the viewport height', async ({
     page,
   }) => {
+    await expect(page.getByRole('img', { name: /^Physical size/ })).toBeVisible()
     const preview = await page.locator('.compare-visual__preview').boundingBox()
     const main = await page.locator('.app-main').boundingBox()
     const viewport = page.viewportSize()
@@ -157,6 +158,8 @@ test.describe('compare', () => {
   test('the drawing labels sit inside their outlines and never overlap', async ({
     page,
   }) => {
+    // The drawing loads with the Compare view, so wait for it before reading the labels.
+    await expect(page.getByRole('img', { name: /^Physical size/ })).toBeVisible()
     const result = await page.evaluate(() => {
       const svg = document.querySelector('.visualization__svg').getBoundingClientRect()
       const boxes = [...document.querySelectorAll('text.visualization__label')].map(
@@ -199,10 +202,10 @@ test.describe('compare', () => {
   }) => {
     const manager = page.getByRole('region', { name: 'Displays in this comparison' })
     const row = manager.getByRole('listitem').filter({ hasText: '34″ UWQHD' })
-    await row.getByRole('button', { name: 'Set 34″ UWQHD as baseline' }).click()
+    await row.getByRole('button', { name: 'Set as baseline for 34″ UWQHD' }).click()
 
     await expect(row).toContainText('Baseline')
-    await expect(manager.getByRole('button', { name: 'Set 34″ UWQHD as baseline' })).toHaveCount(0)
+    await expect(manager.getByRole('button', { name: 'Set as baseline for 34″ UWQHD' })).toHaveCount(0)
     await expect(
       page.locator('text.visualization__label', { hasText: '34″ UWQHD · Baseline' }),
     ).toHaveCount(1)

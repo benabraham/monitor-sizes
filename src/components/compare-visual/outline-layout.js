@@ -31,8 +31,12 @@ export const LABEL_INSET = 6
 /** Height of one label line. A label that would clash is moved down by this much. */
 export const LABEL_LINE = 18
 
-/** Estimated advance of one label character, used to size a label for collision checks. */
-export const LABEL_CHAR_WIDTH = 7.5
+/**
+ * Estimated advance of one label character, used to size a label for collision checks. It is
+ * generous on purpose: capitals and digits are wider than the average character, and the font
+ * differs from system to system. A label estimated too narrow could overlap its neighbour.
+ */
+export const LABEL_CHAR_WIDTH = 9
 
 /** Distance from a label's baseline to the top of its capitals. */
 const LABEL_ASCENT = 13
@@ -141,7 +145,9 @@ const labelTextOf = (entry) =>
 
 /**
  * Whether two label boxes would overlap: their horizontal extents meet, and their
- * baselines are closer than one label line.
+ * baselines are closer than one label line. The comparison allows for floating point
+ * error: a label moved exactly one line down must not count as clashing with the label it
+ * was moved below.
  *
  * @param {{ left: number, right: number, baseline: number }} first
  * @param {{ left: number, right: number, baseline: number }} second
@@ -150,7 +156,7 @@ const labelTextOf = (entry) =>
 const isClashing = (first, second) =>
   first.left < second.right &&
   second.left < first.right &&
-  Math.abs(first.baseline - second.baseline) < LABEL_LINE
+  Math.abs(first.baseline - second.baseline) < LABEL_LINE - EPSILON
 
 /**
  * Place the labels in the top-left inner corner of their outlines, so that no two of
@@ -187,7 +193,9 @@ export const placeLabels = ({ outlines, minX, maxX }) => {
       baseline: y + LABEL_INSET + LABEL_ASCENT,
     }
     let clash = placed.find((other) => isClashing(other, box))
-    while (clash) {
+    // Each move goes one line below a placed label, so at most `placed.length` moves are
+    // needed. The bound keeps the loop finite even if the arithmetic ever disagrees.
+    for (let moves = 0; clash && moves <= placed.length; moves += 1) {
       box = { ...box, baseline: clash.baseline + LABEL_LINE }
       clash = placed.find((other) => isClashing(other, box))
     }
