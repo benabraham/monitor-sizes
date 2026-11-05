@@ -48,7 +48,11 @@ test.describe('language and units (PRD F16, F17)', () => {
     page,
   }) => {
     await expect(page.locator('html')).toHaveAttribute('lang', 'en')
-    await expect(page.getByRole('navigation', { name: 'Views' }).getByRole('button', { name: 'Browse' })).toBeVisible()
+    await expect(
+      page
+        .getByRole('navigation', { name: 'Views' })
+        .getByRole('button', { name: 'Browse' }),
+    ).toBeVisible()
     await expect(page.getByText('14.2″', { exact: true }).first()).toBeVisible()
 
     await chooseLanguage(page, 'Čeština')
@@ -56,7 +60,9 @@ test.describe('language and units (PRD F16, F17)', () => {
     await expect(page.locator('html')).toHaveAttribute('lang', 'cs')
     const views = page.getByRole('navigation', { name: 'Zobrazení' })
     await expect(views.getByRole('button', { name: 'Procházet' })).toBeVisible()
-    await expect(views.getByRole('button', { name: /^Porovnat \(0\)|^Porovnat$|^Porovnat \(/ })).toBeVisible()
+    await expect(
+      views.getByRole('button', { name: /^Porovnat \(0\)|^Porovnat$|^Porovnat \(/ }),
+    ).toBeVisible()
     await expect(page.getByRole('region', { name: 'Známé displeje' })).toBeVisible()
     await expect(page.getByText('14,2″', { exact: true }).first()).toBeVisible()
     await expect(page.getByText('14.2″', { exact: true })).toHaveCount(0)
@@ -73,7 +79,9 @@ test.describe('language and units (PRD F16, F17)', () => {
       .getByRole('listitem')
       .filter({ has: page.getByRole('group', { name: /^14\.2″ MacBook Pro 14″/ }) })
     // The baseline is 45 cm away, which is 17.7 in.
-    await expect(baseline.getByRole('textbox', { name: 'Exact distance' })).toHaveValue('17.7')
+    await expect(baseline.getByRole('textbox', { name: 'Exact distance' })).toHaveValue(
+      '17.7',
+    )
     await expect(baseline.getByText('in', { exact: true }).first()).toBeVisible()
   })
 

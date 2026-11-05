@@ -29,7 +29,13 @@ const buildComparison = async (page) => {
     setup: { [DISPLAYS.uhd27.prefix]: { distance: 70, scale: 1.5 } },
   })
   const dialog = await openAddDisplay(page)
-  await fillAddDisplay({ dialog, name: STUDIO.name, diagonal: '27', width: '2560', height: '1440' })
+  await fillAddDisplay({
+    dialog,
+    name: STUDIO.name,
+    diagonal: '27',
+    width: '2560',
+    height: '1440',
+  })
   await expect(dialog).toBeHidden()
   await addToCompare(page, STUDIO)
   await addToCompare(page, DISPLAYS.uhd32)
@@ -58,7 +64,9 @@ test.describe('share a comparison by link (PRD F19)', () => {
     await expect(banner).toBeVisible()
     await expect(banner).toContainText("You're viewing a shared comparison.")
     await expect(visitor.getByRole('heading', { level: 1 })).toHaveText('Compare')
-    await expect(visitor.getByRole('heading', { level: 1, name: STEP1_TITLE })).toHaveCount(0)
+    await expect(
+      visitor.getByRole('heading', { level: 1, name: STEP1_TITLE }),
+    ).toHaveCount(0)
 
     const compared = visitor.getByRole('list', { name: 'Compared displays' })
     await expect(compared).toContainText('MacBook Pro 14″')
@@ -68,7 +76,9 @@ test.describe('share a comparison by link (PRD F19)', () => {
     const candidate = visitor
       .getByRole('listitem')
       .filter({ has: visitor.getByRole('group', { name: /^32″ 4K UHD/ }) })
-    await expect(candidate.getByRole('textbox', { name: 'Exact distance' })).toHaveValue('80')
+    await expect(candidate.getByRole('textbox', { name: 'Exact distance' })).toHaveValue(
+      '80',
+    )
     await expect(
       visitor
         .getByRole('listitem')
@@ -92,11 +102,17 @@ test.describe('share a comparison by link (PRD F19)', () => {
 
     await visitor.getByRole('button', { name: 'Back to mine' }).click()
 
-    await expect(visitor.getByRole('region', { name: 'Shared comparison' })).toHaveCount(0)
-    await expect(visitor.getByRole('heading', { level: 1, name: STEP1_TITLE })).toBeVisible()
+    await expect(visitor.getByRole('region', { name: 'Shared comparison' })).toHaveCount(
+      0,
+    )
+    await expect(
+      visitor.getByRole('heading', { level: 1, name: STEP1_TITLE }),
+    ).toBeVisible()
     // Nothing of the sender's comparison is in the visitor's own storage.
     await expect(visitor.getByRole('checkbox', { name: /^Studio 27/ })).toHaveCount(0)
-    await expect(visitor.getByRole('checkbox', { name: /^4K UHD, 32″/ })).not.toBeChecked()
+    await expect(
+      visitor.getByRole('checkbox', { name: /^4K UHD, 32″/ }),
+    ).not.toBeChecked()
 
     await visitorContext.close()
   })
@@ -113,17 +129,23 @@ test.describe('share a comparison by link (PRD F19)', () => {
     await expect(visitor.getByRole('region', { name: 'Shared comparison' })).toBeVisible()
 
     await visitor.getByRole('button', { name: 'Keep it' }).click()
-    await expect(visitor.getByRole('region', { name: 'Shared comparison' })).toHaveCount(0)
+    await expect(visitor.getByRole('region', { name: 'Shared comparison' })).toHaveCount(
+      0,
+    )
 
     await visitor.reload()
 
-    await expect(visitor.getByRole('region', { name: 'Shared comparison' })).toHaveCount(0)
-    await expect(visitor.getByRole('heading', { level: 1, name: STEP1_TITLE })).toHaveCount(0)
+    await expect(visitor.getByRole('region', { name: 'Shared comparison' })).toHaveCount(
+      0,
+    )
+    await expect(
+      visitor.getByRole('heading', { level: 1, name: STEP1_TITLE }),
+    ).toHaveCount(0)
     await goToView(visitor, 'browse')
     const strip = visitor.getByRole('region', { name: 'Familiar displays' })
-    await expect(strip.getByRole('listitem').filter({ hasText: 'MacBook Pro 14″' })).toContainText(
-      'Baseline',
-    )
+    await expect(
+      strip.getByRole('listitem').filter({ hasText: 'MacBook Pro 14″' }),
+    ).toContainText('Baseline')
     await expect(strip.getByRole('button', { name: /^4K UHD 27″/ })).toBeVisible()
     await expect(displayItem(visitor, STUDIO)).toBeVisible()
 
@@ -141,7 +163,9 @@ test.describe('share a comparison by link (PRD F19)', () => {
 
     await page.getByRole('button', { name: 'Copy link' }).click()
 
-    await expect(page.locator('.app-header').getByRole('status').filter({ hasText: 'Link copied' })).toBeAttached()
+    await expect(
+      page.locator('.app-header').getByRole('status').filter({ hasText: 'Link copied' }),
+    ).toBeAttached()
     const copied = await page.evaluate(() => navigator.clipboard.readText())
     expect(copied).toBe(page.url())
   })

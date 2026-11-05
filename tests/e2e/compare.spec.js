@@ -1,10 +1,5 @@
 import { expect, test } from '@playwright/test'
-import {
-  DISPLAYS,
-  addToCompare,
-  completeOnboarding,
-  goToView,
-} from './helpers.js'
+import { DISPLAYS, addToCompare, completeOnboarding, goToView } from './helpers.js'
 
 /**
  * Asserts that a locator's box lies inside the visible viewport.
@@ -38,9 +33,11 @@ const describedText = (button) =>
 
 /** The candidate's card in Compare, found by its diagonal and name. */
 const candidate = (page, display) =>
-  page
-    .getByRole('listitem')
-    .filter({ has: page.getByRole('group', { name: new RegExp(`^${display.diagonal} ${display.name}`) }) })
+  page.getByRole('listitem').filter({
+    has: page.getByRole('group', {
+      name: new RegExp(`^${display.diagonal} ${display.name}`),
+    }),
+  })
 
 test.describe('compare', () => {
   test.beforeEach(async ({ page }) => {
@@ -50,8 +47,12 @@ test.describe('compare', () => {
     await goToView(page, 'compare')
   })
 
-  test('the visualization is on screen and stays on screen when scrolled', async ({ page }) => {
-    const visual = page.getByRole('img', { name: /^Physical size of the compared displays/ })
+  test('the visualization is on screen and stays on screen when scrolled', async ({
+    page,
+  }) => {
+    const visual = page.getByRole('img', {
+      name: /^Physical size of the compared displays/,
+    })
     await expect(visual).toBeVisible()
     await expectInViewport(page, visual)
 
@@ -70,7 +71,9 @@ test.describe('compare', () => {
     // The radio is visually hidden inside its label, so the label is what a person clicks.
     await mode.locator('label', { hasText: 'As seen' }).click()
 
-    await expect(page.getByRole('img', { name: /^Apparent size of the compared displays/ })).toBeVisible()
+    await expect(
+      page.getByRole('img', { name: /^Apparent size of the compared displays/ }),
+    ).toBeVisible()
     await expect(page.getByText(/^As seen: each outline shows its angle/)).toBeVisible()
 
     await mode.locator('label', { hasText: 'Physical' }).click()
@@ -91,7 +94,9 @@ test.describe('compare', () => {
     await expect(line).not.toHaveText(before)
   })
 
-  test('Match size sets the candidate distance to the size-equivalent distance', async ({ page }) => {
+  test('Match size sets the candidate distance to the size-equivalent distance', async ({
+    page,
+  }) => {
     const card = candidate(page, DISPLAYS.uhd32)
     const matchSize = card.getByRole('button', { name: 'Match size' })
     const target = await describedText(matchSize)
@@ -100,7 +105,9 @@ test.describe('compare', () => {
 
     await matchSize.click()
 
-    await expect(card.getByRole('textbox', { name: 'Exact distance' })).toHaveValue(distance)
+    await expect(card.getByRole('textbox', { name: 'Exact distance' })).toHaveValue(
+      distance,
+    )
   })
 
   test('the metric grid lists the baseline first', async ({ page }) => {
@@ -115,16 +122,24 @@ test.describe('compare', () => {
     await expect(headers.nth(4)).toContainText('UWQHD')
   })
 
-  test('the scaling matrix marks the comfortable scales of a candidate', async ({ page }) => {
+  test('the scaling matrix marks the comfortable scales of a candidate', async ({
+    page,
+  }) => {
     // Two matrices are captioned "4K UHD", in Compare order: the familiar 27″, then the 32″.
     const matrix = page.getByRole('table', { name: /^Scaling options for 4K UHD/ }).nth(1)
     await expect(matrix).toBeVisible()
     // 32″ 4K at 150 % has 92 effective PPI, inside the 90–105 window.
-    const row150 = matrix.getByRole('row').filter({ has: page.getByRole('rowheader', { name: '150 %' }) })
+    const row150 = matrix
+      .getByRole('row')
+      .filter({ has: page.getByRole('rowheader', { name: '150 %' }) })
     await expect(row150.getByRole('cell', { name: /^Comfortable/ })).toBeVisible()
     await expect(row150).toContainText('92')
     // 100 % has 138 effective PPI, outside the window.
-    const row100 = matrix.getByRole('row').filter({ has: page.getByRole('rowheader', { name: '100 %' }) })
-    await expect(row100.getByRole('cell', { name: 'Outside the comfort window' })).toBeVisible()
+    const row100 = matrix
+      .getByRole('row')
+      .filter({ has: page.getByRole('rowheader', { name: '100 %' }) })
+    await expect(
+      row100.getByRole('cell', { name: 'Outside the comfort window' }),
+    ).toBeVisible()
   })
 })

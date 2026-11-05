@@ -50,7 +50,9 @@ test.describe('performance (PRD Non-functional: Performance)', () => {
       })
 
       await page.goto(APP_PATH)
-      await expect(page.getByRole('heading', { level: 1, name: STEP1_TITLE })).toBeVisible()
+      await expect(
+        page.getByRole('heading', { level: 1, name: STEP1_TITLE }),
+      ).toBeVisible()
       const timing = await page.evaluate(() => {
         const [navigation] = performance.getEntriesByType('navigation')
         return {
@@ -69,10 +71,14 @@ test.describe('performance (PRD Non-functional: Performance)', () => {
       runs: interactive.map((value) => Math.round(value)),
       medianMs: Math.round(median(interactive)),
       worstMs: Math.round(worst),
-      domContentLoadedMs: Math.round(median(details.map(({ domContentLoaded }) => domContentLoaded))),
+      domContentLoadedMs: Math.round(
+        median(details.map(({ domContentLoaded }) => domContentLoaded)),
+      ),
       loadMs: Math.round(median(details.map(({ load }) => load))),
     }
-    test.info().annotations.push({ type: 'first-load', description: JSON.stringify(summary) })
+    test
+      .info()
+      .annotations.push({ type: 'first-load', description: JSON.stringify(summary) })
     expect(worst, JSON.stringify(summary)).toBeLessThan(FIRST_LOAD_BUDGET_MS)
   })
 
@@ -82,46 +88,53 @@ test.describe('performance (PRD Non-functional: Performance)', () => {
     // Times each input, inside the page, from the input event to the DOM update that shows
     // the new count. The next painted frame is timed too, for information: painting is
     // software rendering in a headless browser, so it is not what the budget measures.
-    const samples = await page.evaluate(async (queries) => {
-      const input = document.querySelector('.filter-bar input[type="search"]')
-      const count = document.querySelector('.browse__count')
-      /**
-       * Dispatches one input and resolves once the count has changed.
-       *
-       * @param {string} value
-       * @returns {Promise<{ value: string, ms: number, frameMs: number, text: string }>}
-       */
-      const timeInput = (value) =>
-        new Promise((resolve, reject) => {
-          const start = performance.now()
-          const timer = setTimeout(() => {
-            observer.disconnect()
-            reject(new Error(`no update for "${value}"`))
-          }, 2000)
-          const observer = new MutationObserver(() => {
-            observer.disconnect()
-            clearTimeout(timer)
-            const ms = performance.now() - start
-            requestAnimationFrame(() =>
-              resolve({
-                value,
-                ms,
-                frameMs: performance.now() - start,
-                text: count.textContent,
-              }),
-            )
+    const samples = await page.evaluate(
+      async (queries) => {
+        const input = document.querySelector('.filter-bar input[type="search"]')
+        const count = document.querySelector('.browse__count')
+        /**
+         * Dispatches one input and resolves once the count has changed.
+         *
+         * @param {string} value
+         * @returns {Promise<{ value: string, ms: number, frameMs: number, text: string }>}
+         */
+        const timeInput = (value) =>
+          new Promise((resolve, reject) => {
+            const start = performance.now()
+            const timer = setTimeout(() => {
+              observer.disconnect()
+              reject(new Error(`no update for "${value}"`))
+            }, 2000)
+            const observer = new MutationObserver(() => {
+              observer.disconnect()
+              clearTimeout(timer)
+              const ms = performance.now() - start
+              requestAnimationFrame(() =>
+                resolve({
+                  value,
+                  ms,
+                  frameMs: performance.now() - start,
+                  text: count.textContent,
+                }),
+              )
+            })
+            observer.observe(count, {
+              childList: true,
+              characterData: true,
+              subtree: true,
+            })
+            input.value = value
+            input.dispatchEvent(new Event('input', { bubbles: true }))
           })
-          observer.observe(count, { childList: true, characterData: true, subtree: true })
-          input.value = value
-          input.dispatchEvent(new Event('input', { bubbles: true }))
-        })
 
-      const results = []
-      for (const query of queries) {
-        results.push(await timeInput(query))
-      }
-      return results
-    }, ['MacBook', '', 'QHD', '', '4K UHD', ''])
+        const results = []
+        for (const query of queries) {
+          results.push(await timeInput(query))
+        }
+        return results
+      },
+      ['MacBook', '', 'QHD', '', '4K UHD', ''],
+    )
 
     const times = samples.map(({ ms }) => ms)
     const round = (value) => Math.round(value * 10) / 10
@@ -131,7 +144,9 @@ test.describe('performance (PRD Non-functional: Performance)', () => {
       worstWithFrameMs: round(Math.max(...samples.map(({ frameMs }) => frameMs))),
       samples: samples.map(({ value, ms }) => ({ value, ms: round(ms) })),
     }
-    test.info().annotations.push({ type: 'search-input', description: JSON.stringify(summary) })
+    test
+      .info()
+      .annotations.push({ type: 'search-input', description: JSON.stringify(summary) })
 
     expect(samples[0].text).toBe('Displays shown: 5')
     expect(Math.max(...times), JSON.stringify(summary)).toBeLessThan(SEARCH_BUDGET_MS)

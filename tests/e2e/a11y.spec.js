@@ -40,15 +40,21 @@ for (const colorScheme of /** @type {const} */ (['light', 'dark'])) {
 
     test('onboarding step 1 has no WCAG 2.2 AA violations', async ({ page }) => {
       await page.goto(APP_PATH)
-      await expect(page.getByRole('heading', { level: 1, name: STEP1_TITLE })).toBeVisible()
+      await expect(
+        page.getByRole('heading', { level: 1, name: STEP1_TITLE }),
+      ).toBeVisible()
       await expectNoA11yViolations(page)
     })
 
-    test('onboarding step 1 with a pick and the inline add form open', async ({ page }) => {
+    test('onboarding step 1 with a pick and the inline add form open', async ({
+      page,
+    }) => {
       await page.goto(APP_PATH)
       await page.getByRole('checkbox', { name: /^MacBook Pro 14″/ }).check()
       await page.getByRole('button', { name: 'Add your own' }).click()
-      await expect(page.getByRole('heading', { name: 'Add your own display' })).toBeVisible()
+      await expect(
+        page.getByRole('heading', { name: 'Add your own display' }),
+      ).toBeVisible()
       await expectNoA11yViolations(page)
     })
 
@@ -57,7 +63,9 @@ for (const colorScheme of /** @type {const} */ (['light', 'dark'])) {
       await page.getByRole('checkbox', { name: /^MacBook Pro 14″/ }).check()
       await page.getByRole('checkbox', { name: /^4K UHD, 27″/ }).check()
       await page.getByRole('button', { name: 'Continue' }).click()
-      await expect(page.getByRole('heading', { level: 1, name: STEP2_TITLE })).toBeVisible()
+      await expect(
+        page.getByRole('heading', { level: 1, name: STEP2_TITLE }),
+      ).toBeVisible()
       await expectNoA11yViolations(page)
     })
 
@@ -105,7 +113,9 @@ for (const colorScheme of /** @type {const} */ (['light', 'dark'])) {
 }
 
 test.describe('keyboard', () => {
-  test('from the page start, Tab reaches the skip link, then the view switch', async ({ page }) => {
+  test('from the page start, Tab reaches the skip link, then the view switch', async ({
+    page,
+  }) => {
     await completeOnboarding({ page })
     // A fresh load starts focus at the top of the document. After onboarding, the view
     // heading holds focus, so the Tab order would begin after it.
@@ -118,7 +128,9 @@ test.describe('keyboard', () => {
 
     await page.keyboard.press('Tab')
     await expect(
-      page.getByRole('navigation', { name: 'Views' }).getByRole('button', { name: 'Browse' }),
+      page
+        .getByRole('navigation', { name: 'Views' })
+        .getByRole('button', { name: 'Browse' }),
     ).toBeFocused()
   })
 
@@ -157,7 +169,9 @@ test.describe('keyboard', () => {
     page,
   }) => {
     await completeOnboarding({ page })
-    const opener = page.locator('.app-header').getByRole('button', { name: 'Add display' })
+    const opener = page
+      .locator('.app-header')
+      .getByRole('button', { name: 'Add display' })
     await opener.click()
     const dialog = page.getByRole('dialog', { name: 'Add display' })
     await expect(dialog).toBeVisible()

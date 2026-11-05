@@ -95,14 +95,26 @@ const completeOnboarding = async (page) => {
  * @returns {Promise<void>}
  */
 const openCompareWithCandidates = async (page) => {
+  const isPhone = (page.viewportSize()?.width ?? 1280) < 600
   for (const { name, diagonal } of CANDIDATES) {
-    const row = page
-      .getByRole('row')
-      .filter({ has: page.getByRole('rowheader', { name: new RegExp(`^${name}$`) }) })
-      .filter({ has: page.getByRole('cell', { name: diagonal, exact: true }) })
-    await row.getByRole('checkbox', { name: `Compare ${name}` }).check()
+    // Browse shows a table on desktop and cards below 600 px, so the row is found per layout.
+    const item = isPhone
+      ? page
+          .getByRole('listitem')
+          .filter({
+            has: page.getByRole('heading', { level: 3, name: new RegExp(`^${name}$`) }),
+          })
+          .filter({ has: page.getByText(diagonal, { exact: true }) })
+      : page
+          .getByRole('row')
+          .filter({ has: page.getByRole('rowheader', { name: new RegExp(`^${name}$`) }) })
+          .filter({ has: page.getByRole('cell', { name: diagonal, exact: true }) })
+    await item.getByRole('checkbox', { name: `Compare ${name}` }).check()
   }
-  await page.getByRole('navigation', { name: 'Views' }).getByRole('button', { name: /^Compare/ }).click()
+  await page
+    .getByRole('navigation', { name: 'Views' })
+    .getByRole('button', { name: /^Compare/ })
+    .click()
   await page.getByRole('heading', { level: 1, name: 'Compare' }).waitFor()
   await page.locator('label', { hasText: 'As seen' }).click()
   await page.getByRole('img', { name: /^Apparent size/ }).waitFor()
@@ -130,7 +142,9 @@ const shoot = async ({ browser, file, device, scene }) => {
       if (bytes / 1024 <= MAX_KB || deviceScaleFactor === 1.5) {
         return { file, ...device, deviceScaleFactor, bytes }
       }
-      console.log(`${file}: ${Math.round(bytes / 1024)} kB at ${deviceScaleFactor}×, retrying at 1.5×`)
+      console.log(
+        `${file}: ${Math.round(bytes / 1024)} kB at ${deviceScaleFactor}×, retrying at 1.5×`,
+      )
     } finally {
       await context.close()
     }
@@ -154,7 +168,11 @@ const main = async () => {
   try {
     await waitForServer(BASE)
     const desktop = { viewport: { width: 1280, height: 800 }, deviceScaleFactor: 2 }
-    const phone = { ...devices['Pixel 7'], viewport: { width: 390, height: 844 }, deviceScaleFactor: 3 }
+    const phone = {
+      ...devices['Pixel 7'],
+      viewport: { width: 390, height: 844 },
+      deviceScaleFactor: 3,
+    }
 
     const shots = []
     shots.push(

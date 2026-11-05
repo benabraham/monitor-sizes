@@ -16,7 +16,9 @@ test.describe('first run onboarding (PRD F2, F3)', () => {
     await expect(page.getByRole('heading', { level: 1, name: STEP1_TITLE })).toBeVisible()
     await expect(page.getByText('Step 1 of 2')).toBeVisible()
     await expect(page.getByRole('button', { name: 'Continue' })).toBeDisabled()
-    await expect(page.getByRole('status').filter({ hasText: 'Pick at least one display' })).toBeVisible()
+    await expect(
+      page.getByRole('status').filter({ hasText: 'Pick at least one display' }),
+    ).toBeVisible()
     await expect(page.getByText('Selected: 0')).toBeVisible()
 
     await page.getByRole('checkbox', { name: startsWith(DISPLAYS.mbp14.prefix) }).check()
@@ -78,16 +80,18 @@ test.describe('first run onboarding (PRD F2, F3)', () => {
     })
 
     const strip = page.getByRole('region', { name: 'Familiar displays' })
-    await expect(strip.getByRole('listitem').filter({ hasText: 'MacBook Pro 14″' })).toContainText(
-      'Baseline',
-    )
+    await expect(
+      strip.getByRole('listitem').filter({ hasText: 'MacBook Pro 14″' }),
+    ).toContainText('Baseline')
     await expect(strip.getByRole('button', { name: /^4K UHD 27″/ })).toBeVisible()
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Browse')
 
     await page.reload()
 
     await expectBrowse(page)
-    await expect(page.getByRole('heading', { level: 1, name: STEP1_TITLE })).toHaveCount(0)
+    await expect(page.getByRole('heading', { level: 1, name: STEP1_TITLE })).toHaveCount(
+      0,
+    )
     await expect(
       page.getByRole('region', { name: 'Familiar displays' }).getByRole('button', {
         name: /^4K UHD 27″/,
@@ -103,10 +107,15 @@ test.describe('first run onboarding (PRD F2, F3)', () => {
       displays: [DISPLAYS.mbp14, DISPLAYS.uhd27],
       setup: { [DISPLAYS.uhd27.prefix]: { distance: 70, scale: 1.5 } },
     })
-    await page.getByRole('navigation', { name: 'Views' }).getByRole('button', { name: /^Compare/ }).click()
+    await page
+      .getByRole('navigation', { name: 'Views' })
+      .getByRole('button', { name: /^Compare/ })
+      .click()
 
     const monitor = page.getByRole('group', { name: /^27″ 4K UHD/ })
-    await expect(monitor.getByRole('textbox', { name: 'Exact distance' })).toHaveValue('70')
+    await expect(monitor.getByRole('textbox', { name: 'Exact distance' })).toHaveValue(
+      '70',
+    )
     await expect(monitor.getByRole('combobox', { name: 'Scale' })).toHaveValue('1.5')
   })
 
@@ -119,6 +128,8 @@ test.describe('first run onboarding (PRD F2, F3)', () => {
     const first = strip.getByRole('listitem').first()
     await expect(first).toContainText('Baseline')
     await expect(first).toContainText('4K UHD')
-    await expect(strip.getByRole('listitem').filter({ hasText: 'Baseline' })).toHaveCount(1)
+    await expect(strip.getByRole('listitem').filter({ hasText: 'Baseline' })).toHaveCount(
+      1,
+    )
   })
 })
