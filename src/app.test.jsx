@@ -384,6 +384,24 @@ describe('Compare', () => {
   })
 })
 
+describe('Scale preset in the header', () => {
+  it('switches the preset from Browse and from Compare, through the setting Settings uses', async () => {
+    const user = userEvent.setup()
+    const { store } = renderApp({ stored: ONBOARDED })
+    await waitForView('Browse')
+
+    const browseGroup = screen.getByRole('group', { name: 'Scale preset' })
+    await user.click(within(browseGroup).getByRole('radio', { name: 'macOS' }))
+    expect(store.presetId.value).toBe('macos')
+    expect(within(browseGroup).getByRole('radio', { name: 'macOS' }).checked).toBe(true)
+
+    await user.click(within(navigation()).getByRole('button', { name: /^Compare/ }))
+    await waitForView('Compare')
+    const compareGroup = screen.getByRole('group', { name: 'Scale preset' })
+    expect(within(compareGroup).getByRole('radio', { name: 'macOS' }).checked).toBe(true)
+  })
+})
+
 describe('Settings', () => {
   it('switching to Čeština changes the texts, uses decimal commas and sets the page language', async () => {
     const user = userEvent.setup()

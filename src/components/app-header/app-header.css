@@ -122,10 +122,13 @@
   }
 
   .app-header__preset .segmented__option {
+    display: flex;
     flex: 1 1 0;
+    min-inline-size: 0;
   }
 
   .app-header__preset .segmented__text {
+    flex: 1 1 auto;
     justify-content: center;
     padding-inline: var(--space-2);
   }

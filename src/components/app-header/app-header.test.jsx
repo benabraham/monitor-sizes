@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/preact'
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/preact'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { locale } from '../../i18n/index.js'
@@ -123,3 +123,39 @@ describe('AppHeader', () => {
     expect(screen.getByRole('button', { name: 'Nastavení' })).not.toBeNull()
   })
 })
+
+describe('AppHeader: scale preset switch', () => {
+  it('shows the OS scale preset as a labelled switch, with the current preset checked', () => {
+    renderHeader({ presetId: 'macos' })
+    const group = screen.getByRole('group', { name: 'Scale preset' })
+    expect(within(group).getByRole('radio', { name: 'macOS' }).checked).toBe(true)
+    expect(within(group).getByRole('radio', { name: 'Windows' }).checked).toBe(false)
+    expect(within(group).getByRole('radio', { name: 'Linux' }).checked).toBe(false)
+  })
+
+  it('shows the switch in Compare as well as in Browse', () => {
+    renderHeader({ view: 'compare', presetId: 'linux' })
+    const group = screen.getByRole('group', { name: 'Scale preset' })
+    expect(within(group).getByRole('radio', { name: 'Linux' }).checked).toBe(true)
+  })
+
+  it('passes the preset the person picks to onPresetChange', async () => {
+    const user = userEvent.setup()
+    const onPresetChange = vi.fn()
+    renderHeader({ presetId: 'windows', onPresetChange })
+    const group = screen.getByRole('group', { name: 'Scale preset' })
+    await user.click(within(group).getByRole('radio', { name: 'Linux' }))
+    expect(onPresetChange).toHaveBeenCalledWith('linux')
+  })
+
+  it('follows the preset when it changes from outside, for example in Settings', () => {
+    const { rerender } = renderHeader({ presetId: 'windows' })
+    rerender(
+      <AppHeader view="browse" compareCount={3} onViewChange={() => {}} linkUrl="x" presetId="macos" />,
+    )
+    const group = screen.getByRole('group', { name: 'Scale preset' })
+    expect(within(group).getByRole('radio', { name: 'macOS' }).checked).toBe(true)
+    expect(within(group).getByRole('radio', { name: 'Windows' }).checked).toBe(false)
+  })
+})
+

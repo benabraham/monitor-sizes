@@ -13,7 +13,6 @@
 .compare-visual__preview {
   --compare-preview-chrome: 7.5rem;
 
-  grid-area: preview;
   position: sticky;
   top: var(--compare-visual-sticky-top, 0px);
   z-index: var(--z-sticky);
@@ -40,7 +39,6 @@
 }
 
 .compare-visual__controls {
-  grid-area: controls;
   display: grid;
   align-content: start;
   gap: var(--space-3);

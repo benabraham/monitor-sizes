@@ -189,3 +189,38 @@ describe('Visualization', () => {
     )
   })
 })
+
+describe('Visualization: labels in the top-left inner corner', () => {
+  it('draws each label inside its outline, starting at the left and top insets', () => {
+    const { container } = render(
+      <Visualization entries={threeDisplayEntries()} mode="physical" units="metric" />,
+    )
+    const outlines = outlinesOf(container)
+    const labels = [...container.querySelectorAll('text.visualization__label')]
+    expect(labels).toHaveLength(outlines.length)
+    labels.forEach((label, index) => {
+      const outline = outlines[index]
+      const x = Number(label.getAttribute('x'))
+      const y = Number(label.getAttribute('y'))
+      const left = Number(outline.getAttribute('x'))
+      const top = Number(outline.getAttribute('y'))
+      expect(x).toBeGreaterThanOrEqual(left)
+      expect(y).toBeGreaterThan(top)
+      expect(label.hasAttribute('text-anchor')).toBe(false)
+    })
+  })
+
+  it('keeps the label text inside the drawing', () => {
+    const { container } = render(
+      <Visualization entries={workedExampleEntries()} mode="physical" units="metric" />,
+    )
+    const svg = container.querySelector('svg')
+    const [width, height] = svg.getAttribute('viewBox').split(' ').slice(2).map(Number)
+    container.querySelectorAll('text.visualization__label').forEach((label) => {
+      expect(Number(label.getAttribute('x'))).toBeGreaterThanOrEqual(0)
+      expect(Number(label.getAttribute('x'))).toBeLessThan(width)
+      expect(Number(label.getAttribute('y'))).toBeLessThanOrEqual(height)
+    })
+  })
+})
+
