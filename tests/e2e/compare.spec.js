@@ -142,4 +142,84 @@ test.describe('compare', () => {
       row100.getByRole('cell', { name: 'Outside the comfort window' }),
     ).toBeVisible()
   })
+
+  test('the preview spans the full width and takes at most 60 % of the viewport height', async ({
+    page,
+  }) => {
+    const preview = await page.locator('.compare-visual__preview').boundingBox()
+    const main = await page.locator('.app-main').boundingBox()
+    const viewport = page.viewportSize()
+    expect(preview).not.toBeNull()
+    expect(preview.height).toBeLessThanOrEqual(viewport.height * 0.6 + 1)
+    expect(preview.width).toBeGreaterThanOrEqual(main.width - 1)
+  })
+
+  test('the drawing labels sit inside their outlines and never overlap', async ({
+    page,
+  }) => {
+    const result = await page.evaluate(() => {
+      const svg = document.querySelector('.visualization__svg').getBoundingClientRect()
+      const boxes = [...document.querySelectorAll('text.visualization__label')].map(
+        (node) => ({ text: node.textContent, box: node.getBoundingClientRect() }),
+      )
+      const clashes = []
+      boxes.forEach((a, index) =>
+        boxes.slice(index + 1).forEach((b) => {
+          const overlap =
+            a.box.left < b.box.right &&
+            b.box.left < a.box.right &&
+            a.box.top < b.box.bottom &&
+            b.box.top < a.box.bottom
+          if (overlap) clashes.push([a.text, b.text])
+        }),
+      )
+      const outside = boxes
+        .filter(
+          ({ box }) =>
+            box.left < svg.left || box.right > svg.right || box.top < svg.top || box.bottom > svg.bottom,
+        )
+        .map(({ text }) => text)
+      return { count: boxes.length, clashes, outside }
+    })
+    expect(result.count).toBe(4)
+    expect(result.clashes).toEqual([])
+    expect(result.outside).toEqual([])
+  })
+
+  test('the page does not scroll sideways', async ({ page }) => {
+    const widths = await page.evaluate(() => ({
+      scrollWidth: document.documentElement.scrollWidth,
+      innerWidth: window.innerWidth,
+    }))
+    expect(widths.scrollWidth).toBeLessThanOrEqual(widths.innerWidth)
+  })
+
+  test('Set as baseline makes a candidate the baseline, and the numbers follow', async ({
+    page,
+  }) => {
+    const manager = page.getByRole('region', { name: 'Displays in this comparison' })
+    const row = manager.getByRole('listitem').filter({ hasText: '34″ UWQHD' })
+    await row.getByRole('button', { name: 'Set 34″ UWQHD as baseline' }).click()
+
+    await expect(row).toContainText('Baseline')
+    await expect(manager.getByRole('button', { name: 'Set 34″ UWQHD as baseline' })).toHaveCount(0)
+    await expect(
+      page.locator('text.visualization__label', { hasText: '34″ UWQHD · Baseline' }),
+    ).toHaveCount(1)
+    // The former baseline is still familiar, so it keeps its Hide button.
+    await expect(
+      manager.getByRole('button', { name: 'Hide 14.2″ MacBook Pro 14″ from Compare' }),
+    ).toBeVisible()
+  })
+
+  test('switching the scale preset in the header to macOS shows the looks-like sizes', async ({
+    page,
+  }) => {
+    const header = page.locator('.app-header')
+    await header.locator('label', { hasText: 'macOS' }).click()
+    await expect(header.getByRole('radio', { name: 'macOS' })).toBeChecked()
+
+    const matrix = page.getByRole('table', { name: /^Scaling options for 4K UHD/ }).nth(1)
+    await expect(matrix.getByText(/looks like/).first()).toBeVisible()
+  })
 })
