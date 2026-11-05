@@ -65,10 +65,10 @@ items are sub-tasks. Keep this file current — rules in [`CLAUDE.md`](./CLAUDE.
   - [x] Compare phone: cap the pinned visualization height
   - [x] Move the `.visually-hidden` clip fix into `global.css`
 - [x] Optional: long-press on a display to add it to compare (PRD key interaction; checkbox already covers it)
-- [ ] Deploy to GitHub Pages
+- [x] Deploy to GitHub Pages
   - [x] Repo owner: make the repo public (or a plan with private Pages)
-  - [ ] Repo owner: Settings → Pages → Source "GitHub Actions"
-  - [ ] Verify the live app installs and works offline
+  - [x] Repo owner: Settings → Pages → Source "GitHub Actions"
+  - [x] Verify the live app installs and works offline
   - [x] Interim test build published as a private claude.ai artifact (no offline/install there)
   - [x] Store survives refused `history.replaceState` (sandboxed frames)
 
@@ -76,5 +76,6 @@ items are sub-tasks. Keep this file current — rules in [`CLAUDE.md`](./CLAUDE.
 
 - [ ] Show a message when a lazy chunk or language fails to load (currently silent)
 - [ ] Consider defaulting a candidate's distance by its own type (monitor 60 cm) instead of the baseline's distance when the baseline is a laptop (PRD F13 says baseline distance)
+- [ ] Physical drawing: labels crowd when outlines are nearly the same size (e.g. 13–15.6″ laptops); stagger or use a legend
 - [ ] Bump GitHub Actions to Node 24 majors (deprecation warning)
 - [ ] Investigate a NumberField typing race seen while the lazy Compare data mounts
